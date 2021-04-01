@@ -1,7 +1,9 @@
-const mongoose = require('mongoose');
-const Double = require('bson');
+import mongoose from 'mongoose';
+import Double from 'bson';
 
-const { Schema } = mongoose;
+const Schema = mongoose.Schema;
+
+
 
 const investmentSchema = new Schema({
     user: String,

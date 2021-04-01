@@ -1,14 +1,14 @@
-const mongoose = require('mongoose');
-const Double = require('bson');
+import mongoose from 'mongoose';
+import Double from 'bson';
 
-const { Schema } = mongoose;
+const Schema = mongoose.Schema;
 
 const cryptoOptions = {
     discriminatorKey: 'cryptotype',
-    collection: 'daily',
+    collection: 'crypto',
 };
 
-const cryptoSchema = mongoose.model('Daily', new Schema({
+const cryptoSchema = mongoose.model('Crypto', new Schema({
     symbol: String,
     start_time: Date,
     close_time: Date,
@@ -19,4 +19,4 @@ const cryptoSchema = mongoose.model('Daily', new Schema({
     closed: Boolean
 }), );
 
-module.exports = mongoose.model('Daily');
+module.exports = mongoose.model('Crypto');
