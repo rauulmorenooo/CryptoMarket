@@ -10,7 +10,8 @@ const investmentSchema = new Schema({
     symbol: String,
     date: Date,
     qty: Double,
-    price: Double
+    price: Double,
+    open: Boolean
 });
 
 module.exports = mongoose.model('Investment', investmentSchema);
