@@ -28,6 +28,7 @@ router.get('/', (req, res) => {
 // Validate and register user data
 router.post('/user', async (req, res) => {
     let registered = false;
+    console.log(req.body);
 
     // Check if user is already registered
     await User.find({ $or: [ {email: req.body.email },{ username: req.body.username }]}, 'email username', (err, result) => {
@@ -71,7 +72,6 @@ router.post('/user', async (req, res) => {
 
     if (!registered) {
         // User does not exist on database so we validate the data and insert if everything is okey
-        let emailRegex = /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/;
         let valid = true;
         let codes = [];
         let errors = [];
@@ -82,7 +82,7 @@ router.post('/user', async (req, res) => {
             errors.push('Error with field First Name');
         }
 
-        if (req.body.lname == null || !isValidPassword(req.body.lname)) {
+        if (req.body.lname == null || !isValidLastName(req.body.lname)) {
             valid = false;
             codes.push(5);
             errors.push('Error with field Last Name');
@@ -178,8 +178,9 @@ router.delete('/user/:id', async (req, res) => {
 });
 
 // User login
-router.get('/user/login', async (req, res) => {
-    await User.find({ email: req.body.email }, 'email password', (err, result) => {
+router.post('/user/login', async (req, res) => {
+    console.log(req.body);
+    await User.find({ email: req.body.email }, 'id username email password', (err, result) => {
         if (err) {
             console.log('ERROR: ' + err);
             return res.status(500).json({
@@ -194,7 +195,9 @@ router.get('/user/login', async (req, res) => {
                 if (r) return res.status(200).json({
                     status: 'OK',
                     code: 0,
-                    msg: 'Credentials correct'
+                    msg: 'Credentials correct',
+                    user_id: result[0].id,
+                    username: result[0].username
                 });
                 else return res.status(200).json({
                     status: 'ERROR',
@@ -214,7 +217,7 @@ router.get('/user/login', async (req, res) => {
 
 // User Profile
 router.get('/user/:id', async (req, res) => {
-    await User.findById(req.params.id, 'first_name last_name username email investments' ,(err, result) => {
+    await User.findById(req.params.id, 'first_name last_name email' ,(err, result) => {
         if (err) {
             console.log('ERROR: ' + err);
             return res.status(500).json({
@@ -227,14 +230,13 @@ router.get('/user/:id', async (req, res) => {
         return res.status(200).json({
             fname: result.first_name,
             lname: result.last_name,
-            username: result.username,
-            email: result.email,
-            investments: result.investments
+            email: result.email
         });
-    })
+    });
 });
 
 // Change user data
+// TODO: Añadir cambio password
 router.put('/user/:id', async (req, res) => {
     
     let u = {};

@@ -17,11 +17,11 @@ app.use(express.urlencoded({ extended: true }));
 //app.use(express.static(path.join(__dirname, 'public')))
 //app.use(express.static(path.join(__dirname, 'views')))
 app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
+app.use(morgan('tiny'));
+app.use(cors());
 
 app.use('/', cryptomarket);
 
-app.use(morgan('tiny'));
-app.use(cors());
 
 // This MUST go after the routes
 app.use(history());

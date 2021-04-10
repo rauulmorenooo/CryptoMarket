@@ -15,7 +15,22 @@
                     <b-nav-item href="/ranking">Ranking</b-nav-item>
                 </b-navbar-nav>
 
-                <b-navbar-nav class="ml-auto">
+                <b-navbar-nav class="ml-auto" v-if="logged === true || logged === 'true'">
+                    <b-dropdown right variant="primary" id="user-dropdown">
+                        <template #button-content>
+                            <b-icon icon="person-circle" aria-hidden="true" />
+                        </template>
+                        <b-dropdown-item :href="'/user/' + id">
+                            Perfil
+                        </b-dropdown-item>
+                        <b-dropdown-divider></b-dropdown-divider>
+                        <b-dropdown-item-button >
+                            <span class="text-danger" @click="closeSession">Cerrar Sesión</span>
+                        </b-dropdown-item-button>                      
+                    </b-dropdown>
+                </b-navbar-nav>
+                
+                <b-navbar-nav class="ml-auto" v-else>
                     <b-nav-item href="/login">Login</b-nav-item>
                     <b-nav-item href="/register">Registrarse</b-nav-item>
                 </b-navbar-nav>
@@ -26,6 +41,37 @@
 <script>
 
 export default {
-  name: 'NavBar'
+  name: 'NavBar',
+  computed: {
+      logged: function() {
+          if (this.$cookies.isKey('logged')) {
+            return this.$cookies.get('logged');   
+          }
+          else {
+              if (this.$session.exists() && this.$session.has('logged')) 
+                return this.$session.get('logged');
+          }
+      },
+      id: function() {
+          if (this.$cookies.isKey('user_id')) return this.$cookies.get('user_id');
+          else {
+              if (this.$session.exists() && this.$session.has('user_id')) 
+                return this.$session.get('user_id');
+          }
+      },
+      username: function() {
+          if (this.$cookies.isKey('username')) return this.$cookies.get('username');
+          else {
+              if (this.$session.exists() && this.$session.has('username')) 
+                return this.$session.get('username');
+          }
+      }
+  },
+  methods: {
+      closeSession() {
+          console.log('yeeeeet');
+          
+      }
+  }
 };
 </script>
