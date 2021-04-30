@@ -20,8 +20,11 @@
                         <template #button-content>
                             <b-icon icon="person-circle" aria-hidden="true" />
                         </template>
-                        <b-dropdown-item :href="'/user/' + id">
+                        <b-dropdown-item :href="'/user/'">
                             Perfil
+                        </b-dropdown-item>
+                        <b-dropdown-item :href="'/user/dashboard'">
+                            Mi Tablero
                         </b-dropdown-item>
                         <b-dropdown-divider></b-dropdown-divider>
                         <b-dropdown-item-button >
@@ -42,35 +45,58 @@
 
 export default {
   name: 'NavBar',
-  computed: {
-      logged: function() {
-          if (this.$cookies.isKey('logged')) {
-            return this.$cookies.get('logged');   
-          }
-          else {
-              if (this.$session.exists() && this.$session.has('logged')) 
-                return this.$session.get('logged');
-          }
-      },
-      id: function() {
-          if (this.$cookies.isKey('user_id')) return this.$cookies.get('user_id');
-          else {
-              if (this.$session.exists() && this.$session.has('user_id')) 
-                return this.$session.get('user_id');
-          }
-      },
-      username: function() {
-          if (this.$cookies.isKey('username')) return this.$cookies.get('username');
-          else {
-              if (this.$session.exists() && this.$session.has('username')) 
-                return this.$session.get('username');
-          }
+  data() {
+      return {
+          logged: false,
+          id: '',
+          username: '',
+      }
+  },
+  mounted() {
+      if (this.$cookies.isKey('logged')) this.logged = this.$cookies.get('logged');
+      else {
+          if (this.$session.exists() && this.$session.has('logged'))
+          this.logged = this.$session.get('logged');
+      }
+
+      if (this.$cookies.isKey('user_id')) this.id = this.$cookies.get('user_id');
+      else {
+          if (this.$session.exists() && this.$session.has('user_id'))
+          this.id = this.$session.get('user_id');
+      }
+
+      if (this.$cookies.isKey('username')) this.username = this.$cookies.get('username');
+      else {
+          if (this.$session.exists() && this.$session.has('username'))
+          this.username = this.$session.get('username');
       }
   },
   methods: {
       closeSession() {
-          console.log('yeeeeet');
+          this.logged = false;
+          this.id = '';
+          this.username = '';
           
+          if (this.$cookies.isKey('logged')) this.$cookies.remove('logged')
+          else {
+               if (this.$session.exists() && this.$session.has('logged'))
+               this.$session.remove('logged');
+          }
+
+          if (this.$cookies.isKey('user_id')) this.$cookies.remove('user_id')
+          else {
+               if (this.$session.exists() && this.$session.has('user_id'))
+               this.$session.remove('user_id');
+
+          }
+
+          if (this.$cookies.isKey('username')) this.$cookies.remove('username')
+          else {
+               if (this.$session.exists() && this.$session.has('username'))
+               this.$session.remove('username');
+          }
+          
+          this.$router.push('/');
       }
   }
 };

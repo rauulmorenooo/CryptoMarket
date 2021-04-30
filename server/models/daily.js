@@ -10,13 +10,8 @@ const cryptoOptions = {
 
 const cryptoSchema = mongoose.model('Daily', new Schema({
     symbol: String,
-    start_time: Date,
-    close_time: Date,
-    open_price: Double,
-    close_price: Double,
-    highest: Double,
-    lowest: Double,
-    closed: Boolean
+    time: Date,
+    price: String,
 }), );
 
 module.exports = mongoose.model('Daily');

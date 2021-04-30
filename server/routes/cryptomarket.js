@@ -216,6 +216,7 @@ router.post('/user/login', async (req, res) => {
 });
 
 // User Profile
+// TODO: Modificar para que siga las respuestas otras
 router.get('/user/:id', async (req, res) => {
     await User.findById(req.params.id, 'first_name last_name email' ,(err, result) => {
         if (err) {
@@ -236,46 +237,82 @@ router.get('/user/:id', async (req, res) => {
 });
 
 // Change user data
-// TODO: Añadir cambio password
 router.put('/user/:id', async (req, res) => {
     
+    let password = '';
+    let user = await User.findById(req.params.id, 'password', (err, result) => {
+        password = result.password;
+    });
+
     let u = {};
 
     if (req.body.fname != null && isValidFirstName(req.body.fname)) {
         u.first_name = req.body.fname;
     }
 
-    if (req.body.lname != null && isValidPassword(req.body.lname)) {
+    if (req.body.lname != null && isValidLastName(req.body.lname)) {
         u.last_name = req.body.lname;
-    }
-
-    if (req.body.username != null && isValidUsername(req.body.username)) {
-        u.username = req.body.username;
     }
 
     if (req.body.email != null && isValidEmail(req.body.email)) {
         u.email = req.body.email;
     }
 
-    let user = await User.findById(req.params.id, (err, result) => { });
-    await user.updateOne(u, (err, result) => {
-        if (err) {
-            res.status(500).json({
-                status: 'ERROR',
-                code: -1,
-                msg: 'An error has occured ' + err
-            });
-        }    
+    if (req.body.opwd != null && req.body.pwd != null && req.body.rpwd != null) {
+        if (isValidPassword(req.body.opwd) && isValidPassword(req.body.pwd) &&
+            isValidPassword(req.body.rpwd) && (req.body.pwd == req.body.rpwd)) {
+                bcrypt.compare(req.body.opwd, password, (err, r) => {
+                    if (r) {
+                        console.log('yeeet');
+                        bcrypt.genSalt(SALT_ROUNDS, (err, salt) => {
+                            if (err) {
+                                res.status(500).json({
+                                    status: 'ERROR',
+                                    code: -1,
+                                    msg: 'An error has occured ' + err
+                                });
+                            }
 
-        if (result.ok == 1) {
-            res.status(200).json({
-                status: 'OK',
-                code: 0,
-                msg: 'User has been updated'
-            });
+                            bcrypt.hash(req.body.pwd, salt, null, async (err, hash) => {
+                                if (err) return res.status(500).json({
+                                    status: 'ERROR',
+                                    code: -1,
+                                    msg: 'An error has ocurred ' + err
+                                });
+
+                                u.password = hash;
+
+                                console.log(u);
+                                
+                                await user.updateOne(u, (err, result) => {
+                                    if (err) {
+                                        res.status(500).json({
+                                            status: 'ERROR',
+                                            code: -1,
+                                            msg: 'An error has occured ' + err
+                                        });
+                                    }    
+                            
+                                    if (result.ok == 1) {
+                                        res.status(200).json({
+                                            status: 'OK',
+                                            code: 0,
+                                            msg: 'User has been updated'
+                                        });
+                                    }
+                                });
+                            });
+                        });
+                    } else {
+                        return res.status(200).json({
+                            status: 'ERROR',
+                            code: 1,
+                            msg: 'Error updating password'
+                        });
+                    }
+                });
         }
-    });
-
+    }
 });
 
 // Change user password

@@ -11,7 +11,7 @@ const investmentSchema = new Schema({
     date: Date,
     qty: Double,
     price: Double,
-    open: Boolean
+    closed: Boolean
 });
 
 module.exports = mongoose.model('Investment', investmentSchema);

@@ -1,7 +1,6 @@
 <template>
     <div class="d-flex flex-column align-items-center">
         <div v-if="error" class="text-danger">
-            <p></p>
             <li v-for="error in errors" :key="error.msg">
                 {{error.msg}}
             </li>
@@ -10,10 +9,12 @@
         <b-form @submit="onSubmit" @reset="onReset" v-if="show">
             <b-form-group
                 id="input-group-firstname"
-                label='Nombre'
                 label-for="input-first-name"
                 :invalid-feedback="firstNameFeedback"
             >
+                <template #label>
+                    Nombre<span class="text-danger">*</span>
+                </template>
                 <b-form-input :class="firstname"
                     id="input-first-name"
                     v-model="form.firstname"
@@ -25,10 +26,12 @@
 
             <b-form-group
                 id="input-group-lastname"
-                label='Apellidos'
                 label-for="input-last-name"
                 :invalid-feedback="lastNameFeedback"
             >
+                <template #label>
+                    Apellidos<span class="text-danger">*</span>
+                </template>
                 <b-form-input :class="lastname"
                     id="input-last-name"
                     v-model="form.lastname"
@@ -40,10 +43,12 @@
 
             <b-form-group
                 id="input-group-username"
-                label='Nombre de Usuario'
                 label-for="input-username"
                 :invalid-feedback="usernameFeedback"
             >
+                <template #label>
+                    Nombre de usuario<span class="text-danger">*</span>
+                </template>
                 <b-form-input :class="username"
                     id="input-username"
                     v-model="form.username"
@@ -55,10 +60,12 @@
 
             <b-form-group
                 id="input-group-email"
-                label='Correo Electrónico'
                 label-for="input-email"
                 :invalid-feedback="emailFeedback"
             >
+                <template #label>
+                    Correo Electrónico<span class="text-danger">*</span>
+                </template>
                 <b-form-input :class="email"
                     id="input-email"
                     v-model="form.email"
@@ -70,10 +77,12 @@
 
             <b-form-group
                 id="input-group-password"
-                label='Contraseña'
                 label-for="input-password"
                 :invalid-feedback="passwordFeedback"
             >
+                <template #label>
+                    Contraseña<span class="text-danger">*</span>
+                </template>
                 <b-form-input :class="password"
                     id="input-password"
                     v-model="form.password"
@@ -82,13 +91,15 @@
                     required
                 />
             </b-form-group>
-
+            
             <b-form-group
                 id="input-group-rpassword"
-                label='Repite la contraseña'
                 label-for="input-rpassword"
                 :invalid-feedback="rpasswordFeedback"
             >
+                <template #label>
+                    Repite la contraseña<span class="text-danger">*</span>
+                </template>
                 <b-form-input :class="rpassword"
                     id="input-rpassword"
                     v-model="form.rpassword"
