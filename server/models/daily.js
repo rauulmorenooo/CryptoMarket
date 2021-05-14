@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+const mongoose = require('mongoose');
 import Double from 'bson';
 
 const Schema = mongoose.Schema;
@@ -11,7 +11,7 @@ const cryptoOptions = {
 const cryptoSchema = mongoose.model('Daily', new Schema({
     symbol: String,
     time: Date,
-    price: String,
+    price: Number,
 }), );
 
 module.exports = mongoose.model('Daily');

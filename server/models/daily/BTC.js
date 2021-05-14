@@ -1,11 +1,11 @@
-import mongoose from 'mongoose';
+const mongoose = require('mongoose');
 
 const Schema = mongoose.Schema;
 
 const BTCDailySchema = mongoose.model('BTCDaily', new Schema({
     symbol: String,
     time: Date,
-    price: String,
-}), );
+    price: Number,
+}), 'BTCDaily');
 
 module.exports = mongoose.model('BTCDaily');

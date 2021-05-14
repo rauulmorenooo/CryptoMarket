@@ -21,6 +21,8 @@ const BCH = require('../models/daily/BCH');
 
 const recover_prices = () => {
     console.log('\x1b[36m%s\x1b[0m', '\n\n💸Recovering Crypto Prices💸\n');
+
+    let date = new Date().toISOString();
     // Make request to Binance API to recover the actual price of all tickers
     axios.get('https://api.binance.com/api/v3/ticker/price')
         .then(async res => {
@@ -37,7 +39,7 @@ const recover_prices = () => {
 
             await BTC.create({
                 symbol: btcusdt.symbol,
-                time: Date.now(),
+                time: date,
                 price: btcusdt.price
             }, (err, result) => {
                 if (err) return console.log(err);
@@ -46,7 +48,7 @@ const recover_prices = () => {
 
             await ETH.create({
                 symbol: ethusdt.symbol,
-                time: Date.now(),
+                time: date,
                 price: ethusdt.price
             }, (err, result) => {
                 if (err) return console.log(err);
@@ -55,7 +57,7 @@ const recover_prices = () => {
 
             await BNB.create({
                 symbol: bnbusdt.symbol,
-                time: Date.now(),
+                time: date,
                 price: bnbusdt.price
             }, (err, result) => {
                 if (err) return console.log(err);
@@ -64,7 +66,7 @@ const recover_prices = () => {
 
             await DOT.create({
                 symbol: dotusdt.symbol,
-                time: Date.now(),
+                time: date,
                 price: dotusdt.price
             }, (err, result) => {
                 if (err) return console.log(err);
@@ -73,7 +75,7 @@ const recover_prices = () => {
 
             await ADA.create({
                 symbol: adausdt.symbol,
-                time: Date.now(),
+                time: date,
                 price: adausdt.price
             }, (err, result) => {
                 if (err) return console.log(err);
@@ -82,7 +84,7 @@ const recover_prices = () => {
 
             await XRP.create({
                 symbol: xrpusdt.symbol,
-                time: Date.now(),
+                time: date,
                 price: xrpusdt.price
             }, (err, result) => {
                 if (err) return console.log(err);
@@ -91,7 +93,7 @@ const recover_prices = () => {
 
             await LTC.create({
                 symbol: ltcusdt.symbol,
-                time: Date.now(),
+                time: date,
                 price: ltcusdt.price
             }, (err, result) => {
                 if (err) return console.log(err);
@@ -100,7 +102,7 @@ const recover_prices = () => {
 
             await LINK.create({
                 symbol: linkusdt.symbol,
-                time: Date.now(),
+                time: date,
                 price: linkusdt.price
             }, (err, result) => {
                 if (err) return console.log(err);
@@ -109,7 +111,7 @@ const recover_prices = () => {
 
             await BCH.create({
                 symbol: bchusdt.symbol,
-                time: Date.now(),
+                time: date,
                 price: bchusdt.price
             }, (err, result) => {
                 if (err) return console.log(err);

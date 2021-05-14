@@ -1,11 +1,11 @@
-import mongoose from 'mongoose';
+const mongoose = require('mongoose');
 
 const Schema = mongoose.Schema;
 
 const XRPDailySchema = mongoose.model('XRPDaily', new Schema({
     symbol: String,
     time: Date,
-    price: String,
-}), );
+    price: Number,
+}), 'XRPDaily');
 
 module.exports = mongoose.model('XRPDaily');

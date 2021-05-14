@@ -12,7 +12,8 @@ const routes = [
   }, 
   {
     path: '/prices',
-    name: 'Prices'
+    name: 'Prices',
+    component: () => import('../views/Prices.vue')
   },
   {
     path: '/ranking',

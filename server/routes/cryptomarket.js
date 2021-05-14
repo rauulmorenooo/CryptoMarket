@@ -1,7 +1,7 @@
 // Package imports
 import express from 'express';
 import bcrypt from 'bcrypt-nodejs';
-import mongoose from 'mongoose';
+const mongoose = require('mongoose');
 
 // User imports
 import User from '../models/user';
@@ -10,13 +10,33 @@ import { isValidFirstName, isValidLastName, isValidUsername,
 
 const SALT_ROUNDS = 10;
 
+// Crypto imports
+import ADA from '../models/crypto/ADA';
+import BCH from '../models/crypto/BCH';
+import BNB from '../models/crypto/BNB';
+import BTC from '../models/crypto/BTC';
+import DOT from '../models/crypto/DOT';
+import ETH from '../models/crypto/ETH';
+import LINK from '../models/crypto/LINK';
+import LTC from '../models/crypto/LTC';
+import XRP from '../models/crypto/XRP';
+
+import ADADaily from '../models/daily/ADA';
+import BCHDaily from '../models/daily/BCH';
+import BNBDaily from '../models/daily/BNB';
+import BTCDaily from '../models/daily/BTC';
+import DOTDaily from '../models/daily/DOT';
+import ETHDaily from '../models/daily/ETH';
+import LINKDaily from '../models/daily/LINK';
+import LTCDaily from '../models/daily/LTC';
+import XRPDaily from '../models/daily/XRP';
+
 const mongoDB = 'mongodb://localhost:27017/cryptomarket';
 mongoose.connect(mongoDB, {useNewUrlParser: true, useUnifiedTopology: true});
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 
 const router = express.Router();
-
 
 router.get('/', (req, res) => {
     return res.json({
@@ -405,9 +425,48 @@ router.put('/user/:id/password', async (req, res) => {
     });
 });
 
-// Get all users info
-router.get('/user', (req, res) => {
+// Get specif symbol "present" data
+router.get('/symbol/:symbol/', async (req, res) => {
 
+});
+
+// Get specif symbol "historic" data
+router.get('/symbol/:symbol/', async (req, res) => {
+
+});
+
+// Get "daily" symbol data for all symbols
+router.get('/symbol', async (req, res) => {
+    var promises = [];
+    promises.push(ADADaily.find({}, 'symbol price').sort({time: -1}).limit(1).exec());
+    promises.push(BCHDaily.find({}, 'symbol price').sort({time: -1}).limit(1).exec());
+    promises.push(BNBDaily.find({}, 'symbol price').sort({time: -1}).limit(1).exec());
+    promises.push(BTCDaily.find({}, 'symbol price').sort({time: -1}).limit(1).exec());
+    promises.push(DOTDaily.find({}, 'symbol price').sort({time: -1}).limit(1).exec());
+    promises.push(ETHDaily.find({}, 'symbol price').sort({time: -1}).limit(1).exec());
+    promises.push(LINKDaily.find({}, 'symbol price').sort({time: -1}).limit(1).exec());
+    promises.push(LTCDaily.find({}, 'symbol price').sort({time: -1}).limit(1).exec());
+    promises.push(XRPDaily.find({}, 'symbol price').sort({time: -1}).limit(1).exec());
+
+    var cryptomarket = [];
+    Promise.allSettled(promises).then((results) => {
+        results.forEach(r => {
+            cryptomarket.push(r.value);
+        });
+        res.status(200).json({
+            status: 'OK',
+            code: 0,
+            msg: cryptomarket
+        });
+
+    }, (err) => {
+        console.log(err);
+        return res.status(500).json({
+            status: 'ERROR',
+            code: -1,
+            msg: 'An error has occured ' + err
+        });
+    })
 });
 
 module.exports = router;

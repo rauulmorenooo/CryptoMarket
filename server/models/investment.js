@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+const mongoose = require('mongoose');
 import Double from 'bson';
 
 const Schema = mongoose.Schema;
@@ -14,4 +14,4 @@ const investmentSchema = new Schema({
     closed: Boolean
 });
 
-module.exports = mongoose.model('Investment', investmentSchema);
+module.exports = mongoose.model('Investment', investmentSchema, 'INVESTMENT');

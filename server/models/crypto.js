@@ -1,5 +1,4 @@
-import mongoose from 'mongoose';
-import Double from 'bson';
+const mongoose = require('mongoose');
 
 const Schema = mongoose.Schema;
 
@@ -12,10 +11,10 @@ const cryptoSchema = mongoose.model('Crypto', new Schema({
     symbol: String,
     start_time: Date,
     close_time: Date,
-    open_price: Double,
-    close_price: Double,
-    highest: Double,
-    lowest: Double,
+    open_price: Number,
+    close_price: Number,
+    highest: Number,
+    lowest: Number,
     closed: Boolean
 }), );
 

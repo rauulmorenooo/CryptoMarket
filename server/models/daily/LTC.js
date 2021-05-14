@@ -1,11 +1,11 @@
-import mongoose from 'mongoose';
+const mongoose = require('mongoose');
 
 const Schema = mongoose.Schema;
 
 const LTCDailySchema = mongoose.model('LTCDaily', new Schema({
     symbol: String,
     time: Date,
-    price: String,
-}), );
+    price: Number,
+}), 'LTCDaily');
 
 module.exports = mongoose.model('LTCDaily');

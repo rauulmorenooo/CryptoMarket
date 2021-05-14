@@ -1,11 +1,11 @@
-import mongoose from 'mongoose';
+const mongoose = require('mongoose');
 
 const Schema = mongoose.Schema;
 
 const BNBDailySchema = mongoose.model('BNBDaily', new Schema({
     symbol: String,
     time: Date,
-    price: String,
-}), );
+    price: Number,
+}), 'BNBDaily');
 
 module.exports = mongoose.model('BNBDaily');
