@@ -1,21 +1,21 @@
 <template>
     <div class="prices">
         <NavBar />
-        <PricesTable />
+        <PricesComponent />
         <Footer />
     </div>
 </template>
 
 <script>
 import NavBar from '../components/NavBar'
-import PricesTable from '../components/PricesTable'
+import PricesComponent from '../components/PricesComponent'
 import Footer from '../components/Footer'
 
 export default {
     name: 'Prices',
     components: {
         'NavBar': NavBar,
-        'PricesTable': PricesTable,
+        'PricesComponent': PricesComponent,
         'Footer': Footer
     }
 }

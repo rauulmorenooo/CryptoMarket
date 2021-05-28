@@ -469,9 +469,12 @@ router.get('/symbol', async (req, res) => {
     })
 });
 
-router.get('/symbol/:symbol/historic', async (req, res) => {
+router.post('/symbol/:symbol/historic', async (req, res) => {
     var symbol = req.params.symbol;
-
+    console.log(symbol);
+    console.log(req.body);
+    console.log(req.body.fdate);
+    console.log(req.body.ldate);
     // Check if body is not empty
     if (req.body.fdate != null && req.body.ldate != null) {
         var firstDate = new Date(req.body.fdate);
@@ -491,7 +494,7 @@ router.get('/symbol/:symbol/historic', async (req, res) => {
                         $gte: firstDate,
                         $lte: lastDate
                     }
-                }).sort('time').exec((error, result) => {
+                }).sort('start_time').exec((error, result) => {
                     if (result != null && result.length > 0) {
                         return res.status(200).json({
                             status: 'OK',
@@ -518,7 +521,7 @@ router.get('/symbol/:symbol/historic', async (req, res) => {
                         $gte: firstDate,
                         $lte: lastDate
                     }
-                }).sort('time').exec((error, result) => {
+                }).sort('start_time').exec((error, result) => {
                     if (result != null && result.length > 0) {
                         return res.status(200).json({
                             status: 'OK',
@@ -546,7 +549,7 @@ router.get('/symbol/:symbol/historic', async (req, res) => {
                         $gte: firstDate,
                         $lte: lastDate
                     }
-                }).sort('time').exec((error, result) => {
+                }).sort('start_time').exec((error, result) => {
                     if (result != null && result.length > 0) {
                         return res.status(200).json({
                             status: 'OK',
@@ -574,7 +577,7 @@ router.get('/symbol/:symbol/historic', async (req, res) => {
                         $gte: firstDate,
                         $lte: lastDate
                     }
-                }).sort('time').exec((error, result) => {
+                }).sort('start_time').exec((error, result) => {
                     if (result != null && result.length > 0) {
                         return res.status(200).json({
                             status: 'OK',
@@ -602,7 +605,7 @@ router.get('/symbol/:symbol/historic', async (req, res) => {
                         $gte: firstDate,
                         $lte: lastDate
                     }
-                }).sort('time').exec((error, result) => {
+                }).sort('start_time').exec((error, result) => {
                     if (result != null && result.length > 0) {
                         return res.status(200).json({
                             status: 'OK',
@@ -630,7 +633,7 @@ router.get('/symbol/:symbol/historic', async (req, res) => {
                         $gte: firstDate,
                         $lte: lastDate
                     }
-                }).sort('time').exec((error, result) => {
+                }).sort('start_time').exec((error, result) => {
                     if (result != null && result.length > 0) {
                         return res.status(200).json({
                             status: 'OK',
@@ -658,7 +661,7 @@ router.get('/symbol/:symbol/historic', async (req, res) => {
                         $gte: firstDate,
                         $lte: lastDate
                     }
-                }).sort('time').exec((error, result) => {
+                }).sort('start_time').exec((error, result) => {
                     if (result != null && result.length > 0) {
                         return res.status(200).json({
                             status: 'OK',
@@ -686,7 +689,7 @@ router.get('/symbol/:symbol/historic', async (req, res) => {
                         $gte: firstDate,
                         $lte: lastDate
                     }
-                }).sort('time').exec((error, result) => {
+                }).sort('start_time').exec((error, result) => {
                     if (result != null && result.length > 0) {
                         return res.status(200).json({
                             status: 'OK',
@@ -714,7 +717,7 @@ router.get('/symbol/:symbol/historic', async (req, res) => {
                         $gte: firstDate,
                         $lte: lastDate
                     }
-                }).sort('time').exec((error, result) => {
+                }).sort('start_time').exec((error, result) => {
                     if (result != null && result.length > 0) {
                         return res.status(200).json({
                             status: 'OK',
