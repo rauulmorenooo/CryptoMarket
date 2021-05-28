@@ -469,4 +469,282 @@ router.get('/symbol', async (req, res) => {
     })
 });
 
+router.get('/symbol/:symbol/historic', async (req, res) => {
+    var symbol = req.params.symbol;
+
+    // Check if body is not empty
+    if (req.body.fdate != null && req.body.ldate != null) {
+        var firstDate = new Date(req.body.fdate);
+        var lastDate = new Date(req.body.ldate);
+        console.log('Symbol: ' + symbol);
+        console.log('First Date: ' + firstDate);
+        console.log('Last Date: ' + lastDate);
+
+        switch (symbol) {
+            case 'ADA':
+                ADA.find({
+                    start_time: {
+                        $gte: firstDate,
+                        $lte: lastDate
+                    },
+                    close_time: {
+                        $gte: firstDate,
+                        $lte: lastDate
+                    }
+                }).sort('time').exec((error, result) => {
+                    if (result != null && result.length > 0) {
+                        return res.status(200).json({
+                            status: 'OK',
+                            code: 0,
+                            msg: result
+                        })
+
+                    } else {
+                        return res.status(500).json({
+                            status: 'ERROR',
+                            code: -1,
+                            msg: 'An error has ocurred ' + error 
+                        })
+                    }
+                });
+                break;
+            case 'BCH':
+                BCH.find({
+                    start_time: {
+                        $gte: firstDate,
+                        $lte: lastDate
+                    },
+                    close_time: {
+                        $gte: firstDate,
+                        $lte: lastDate
+                    }
+                }).sort('time').exec((error, result) => {
+                    if (result != null && result.length > 0) {
+                        return res.status(200).json({
+                            status: 'OK',
+                            code: 0,
+                            msg: result
+                        })
+
+                    } else {
+                        return res.status(500).json({
+                            status: 'ERROR',
+                            code: -1,
+                            msg: 'An error has ocurred ' + error 
+                        })
+                    }
+                });
+                break;
+
+            case 'BNB':
+                BNB.find({
+                    start_time: {
+                        $gte: firstDate,
+                        $lte: lastDate
+                    },
+                    close_time: {
+                        $gte: firstDate,
+                        $lte: lastDate
+                    }
+                }).sort('time').exec((error, result) => {
+                    if (result != null && result.length > 0) {
+                        return res.status(200).json({
+                            status: 'OK',
+                            code: 0,
+                            msg: result
+                        })
+
+                    } else {
+                        return res.status(500).json({
+                            status: 'ERROR',
+                            code: -1,
+                            msg: 'An error has ocurred ' + error 
+                        })
+                    }
+                });
+                break;
+
+            case 'BTC':
+                BTC.find({
+                    start_time: {
+                        $gte: firstDate,
+                        $lte: lastDate
+                    },
+                    close_time: {
+                        $gte: firstDate,
+                        $lte: lastDate
+                    }
+                }).sort('time').exec((error, result) => {
+                    if (result != null && result.length > 0) {
+                        return res.status(200).json({
+                            status: 'OK',
+                            code: 0,
+                            msg: result
+                        })
+
+                    } else {
+                        return res.status(500).json({
+                            status: 'ERROR',
+                            code: -1,
+                            msg: 'An error has ocurred ' + error 
+                        })
+                    }
+                });
+                break;
+
+            case 'DOT':
+                DOT.find({
+                    start_time: {
+                        $gte: firstDate,
+                        $lte: lastDate
+                    },
+                    close_time: {
+                        $gte: firstDate,
+                        $lte: lastDate
+                    }
+                }).sort('time').exec((error, result) => {
+                    if (result != null && result.length > 0) {
+                        return res.status(200).json({
+                            status: 'OK',
+                            code: 0,
+                            msg: result
+                        })
+
+                    } else {
+                        return res.status(500).json({
+                            status: 'ERROR',
+                            code: -1,
+                            msg: 'An error has ocurred ' + error 
+                        })
+                    }
+                });
+                break;
+
+            case 'ETH':
+                ETH.find({
+                    start_time: {
+                        $gte: firstDate,
+                        $lte: lastDate
+                    },
+                    close_time: {
+                        $gte: firstDate,
+                        $lte: lastDate
+                    }
+                }).sort('time').exec((error, result) => {
+                    if (result != null && result.length > 0) {
+                        return res.status(200).json({
+                            status: 'OK',
+                            code: 0,
+                            msg: result
+                        })
+
+                    } else {
+                        return res.status(500).json({
+                            status: 'ERROR',
+                            code: -1,
+                            msg: 'An error has ocurred ' + error 
+                        })
+                    }
+                });
+                break;
+
+            case 'LINK':
+                LINK.find({
+                    start_time: {
+                        $gte: firstDate,
+                        $lte: lastDate
+                    },
+                    close_time: {
+                        $gte: firstDate,
+                        $lte: lastDate
+                    }
+                }).sort('time').exec((error, result) => {
+                    if (result != null && result.length > 0) {
+                        return res.status(200).json({
+                            status: 'OK',
+                            code: 0,
+                            msg: result
+                        })
+
+                    } else {
+                        return res.status(500).json({
+                            status: 'ERROR',
+                            code: -1,
+                            msg: 'An error has ocurred ' + error 
+                        })
+                    }
+                });
+                break;
+
+            case 'LTC':
+                LTC.find({
+                    start_time: {
+                        $gte: firstDate,
+                        $lte: lastDate
+                    },
+                    close_time: {
+                        $gte: firstDate,
+                        $lte: lastDate
+                    }
+                }).sort('time').exec((error, result) => {
+                    if (result != null && result.length > 0) {
+                        return res.status(200).json({
+                            status: 'OK',
+                            code: 0,
+                            msg: result
+                        })
+
+                    } else {
+                        return res.status(500).json({
+                            status: 'ERROR',
+                            code: -1,
+                            msg: 'An error has ocurred ' + error 
+                        })
+                    }
+                });
+                break;
+
+            case 'XRP':
+                XRP.find({
+                    start_time: {
+                        $gte: firstDate,
+                        $lte: lastDate
+                    },
+                    close_time: {
+                        $gte: firstDate,
+                        $lte: lastDate
+                    }
+                }).sort('time').exec((error, result) => {
+                    if (result != null && result.length > 0) {
+                        return res.status(200).json({
+                            status: 'OK',
+                            code: 0,
+                            msg: result
+                        })
+
+                    } else {
+                        return res.status(500).json({
+                            status: 'ERROR',
+                            code: -1,
+                            msg: 'An error has ocurred ' + error 
+                        })
+                    }
+                });
+                break;
+        }
+
+
+
+    } else {
+        return res.status(400).json({
+            status: 'ERROR',
+            code: 1,
+            msg: 'Bad Request. Body must contain first and last date for the specified symbol'
+        })
+    }
+
+
+
+})
+
 module.exports = router;
