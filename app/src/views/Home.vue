@@ -1,23 +1,21 @@
 <template>
   <div class="home">
     <NavBar />
-    <div>
-
-    </div>
+    <Charts />
     <Footer />
   </div>
 </template>
 
 <script>
 import NavBar from '../components/NavBar'
+import Charts from '../components/Charts';
 import Footer from '../components/Footer'
-
-import * as d3 from 'd3';
 
 export default {
   name: 'Home',
   components: {
     'NavBar': NavBar,
+    'Charts': Charts,
     'Footer': Footer
   }
 }

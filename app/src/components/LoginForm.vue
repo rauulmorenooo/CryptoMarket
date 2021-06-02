@@ -1,5 +1,5 @@
 <template>
-    <div class="d-flex flex-column align-items-center">
+    <div class="d-flex flex-column align-items-center" style="height: 85vh">
         <div v-if="error" class="text-danger">Los credenciales son incorrectos</div>
         <br v-if="error">
         <b-form @submit="onSubmit" @reset="onReset" v-if="show">

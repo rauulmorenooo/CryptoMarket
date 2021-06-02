@@ -1,33 +1,32 @@
 <template>
     <div>
-        <div>
-            <b-form-select v-model="crypto" :options="cryptos">
-            </b-form-select>
-            
-        </div>
-        <div v-if="crypto == ''">
-            <h3>
-                Por favor, selecciona una criptomoneda y un rango 
-                de fechas para visualizar la tabla de precios.
-            </h3>
+        <div class="historic-options">
+            <b-form-select class="selector" v-model="crypto" :options="cryptos"></b-form-select>
+            <div v-if="crypto != ''" class="d-flex">
+                <strong>De:</strong> <b-form-datepicker class="date-picker" id="de" v-model="de" />
+                <strong>Hasta:</strong> <b-form-datepicker class="date-picker" id="hasta" v-model="hasta" />
+                <b-button style="margin: 0 1rem;" variant="success" @click="query">Aplicar</b-button>
+            </div>
         </div>
 
         <div v-if="crypto != ''">
-            De: <b-form-datepicker id="de" v-model="de" />
-            Hasta: <b-form-datepicker id="hasta" v-model="hasta" />
-            <b-button variant="success" @click="query">Aplicar</b-button>
-
             <b-table striped bordered small hover no-border-collapse 
                 :items="items"
                 :per-page="perPage"
                 :current-page="currentPage"
             >
             </b-table>
-            <b-pagination
+            <b-pagination v-if="items.length > 0"
                 v-model="currentPage"
                 :total-rows="rows"
                 :per-page="perPage"
             ></b-pagination>
+        </div>
+        <div v-if="crypto == ''">
+            <h3>
+                Por favor, selecciona una criptomoneda y un rango 
+                de fechas para visualizar la tabla de precios.
+            </h3>
         </div>
     </div>
 </template>

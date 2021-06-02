@@ -1,0 +1,105 @@
+.content-cryptomarket {
+    height: 85vh;
+}
+
+.table-father {
+    width: 100vw;
+
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+
+    padding: 1rem 0;
+}
+
+.btn-table:last-child {
+    margin-left: 1rem;
+    margin-right: 1rem;
+}
+
+.historic-options {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    margin: 1rem;
+}
+
+.selector {
+    max-width: 12rem;
+    /* margin: 0 1rem 0 0; */
+}
+
+strong {
+    margin: 0 1rem 0 1rem;
+}
+
+.btn-apply {
+    margin: 0 1rem;
+}
+
+#app {
+    background: #eaeaea;
+}
+
+.navbar {
+    background: #f6f6f6;
+}
+
+.footer {
+    background: #f6f6f6;
+}
+
+.table>thead>tr>th {
+    background-color: #f6f6f6;
+}
+
+.table-striped>tbody>tr:nth-child(odd)>td {
+    background-color: #fcfcfc;
+}
+
+.table-striped>tbody>tr:nth-child(even)>td {
+    background-color: #f6f6f6;
+}
+
+.main {
+    display: flex;
+    flex-direction: row;
+    
+    height: 100%;
+}
+
+.main:last-child {
+    margin-left: 2rem;
+}
+
+.options {
+    height: auto;
+    margin-left: 0.5rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.options > button {
+    justify-self: flex-end;
+}
+
+.options > * {
+    margin: 0.5rem 0;
+}
+
+.options > h4 {
+    align-self: center;
+}
+
+.chart {
+    width: 100%;
+}
+
+.type {
+    display: flex;
+}
+
+.type > button {
+    max-width: 6rem;
+    margin: 0 0.5rem;
+}

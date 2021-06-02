@@ -21,6 +21,10 @@ Vue.$cookies.config('30d'); // Set cookie to expire after 30 days
 import VueSession from 'vue-session'
 Vue.use(VueSession);
 
+import VueApexCharts from 'vue-apexcharts';
+Vue.use(VueApexCharts);
+Vue.component('apexchart', VueApexCharts);
+
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 

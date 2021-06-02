@@ -2,6 +2,7 @@
 import express from 'express';
 import bcrypt from 'bcrypt-nodejs';
 const mongoose = require('mongoose');
+const moment = require('moment');
 
 // User imports
 import User from '../models/user';
@@ -734,6 +735,14 @@ router.post('/symbol/:symbol/historic', async (req, res) => {
                     }
                 });
                 break;
+
+                default:
+                    return res.status(300).json({
+                        status: 'ERROR',
+                        code: 1,
+                        msg: 'Symbol is not correct'
+                    });
+                    break;
         }
 
 
@@ -745,9 +754,737 @@ router.post('/symbol/:symbol/historic', async (req, res) => {
             msg: 'Bad Request. Body must contain first and last date for the specified symbol'
         })
     }
+});
 
+//Get lastest price
+router.get('/symbol/:symbol/lastest', async (req, res) => {
+    var symbol = req.params.symbol;
 
+    switch (symbol) {
+        case 'ADA':
+            ADADaily.find({}).sort('-time').limit(1).exec((error, result) => {
+                if (result != null && result.length > 0) {
+                    return res.status(200).json({
+                        status: 'OK',
+                        code: 0,
+                        msg: result
+                    })
 
-})
+                } else {
+                    return res.status(500).json({
+                        status: 'ERROR',
+                        code: -1,
+                        msg: 'An error has ocurred ' + error 
+                    })
+                }
+            });
+            break;
+        
+        case 'BCH':
+            BCHDaily.find({}).sort('-time').limit(1).exec((error, result) => {
+                if (result != null && result.length > 0) {
+                    return res.status(200).json({
+                        status: 'OK',
+                        code: 0,
+                        msg: result
+                    })
+
+                } else {
+                    return res.status(500).json({
+                        status: 'ERROR',
+                        code: -1,
+                        msg: 'An error has ocurred ' + error 
+                    })
+                }
+            });
+            break;
+        
+        case 'BNB':
+            BNBDaily.find({}).sort('-time').limit(1).exec((error, result) => {
+                if (result != null && result.length > 0) {
+                    return res.status(200).json({
+                        status: 'OK',
+                        code: 0,
+                        msg: result
+                    })
+
+                } else {
+                    return res.status(500).json({
+                        status: 'ERROR',
+                        code: -1,
+                        msg: 'An error has ocurred ' + error 
+                    })
+                }
+            });
+            break;
+        
+        case 'BTC':
+            BTCDaily.find({}).sort('-time').limit(1).exec((error, result) => {
+                if (result != null && result.length > 0) {
+                    return res.status(200).json({
+                        status: 'OK',
+                        code: 0,
+                        msg: result
+                    })
+
+                } else {
+                    return res.status(500).json({
+                        status: 'ERROR',
+                        code: -1,
+                        msg: 'An error has ocurred ' + error 
+                    })
+                }
+            });
+            break;
+        
+        case 'DOT':
+            DOTDaily.find({}).sort('-time').limit(1).exec((error, result) => {
+                if (result != null && result.length > 0) {
+                    return res.status(200).json({
+                        status: 'OK',
+                        code: 0,
+                        msg: result
+                    })
+
+                } else {
+                    return res.status(500).json({
+                        status: 'ERROR',
+                        code: -1,
+                        msg: 'An error has ocurred ' + error 
+                    })
+                }
+            });
+            break;
+        
+        case 'ETH':
+            ETHDaily.find({}).sort('-time').limit(1).exec((error, result) => {
+                if (result != null && result.length > 0) {
+                    return res.status(200).json({
+                        status: 'OK',
+                        code: 0,
+                        msg: result
+                    })
+
+                } else {
+                    return res.status(500).json({
+                        status: 'ERROR',
+                        code: -1,
+                        msg: 'An error has ocurred ' + error 
+                    })
+                }
+            });
+            break;
+        
+        case 'LINK':
+            LINKDaily.find({}).sort('-time').limit(1).exec((error, result) => {
+                if (result != null && result.length > 0) {
+                    return res.status(200).json({
+                        status: 'OK',
+                        code: 0,
+                        msg: result
+                    })
+
+                } else {
+                    return res.status(500).json({
+                        status: 'ERROR',
+                        code: -1,
+                        msg: 'An error has ocurred ' + error 
+                    })
+                }
+            });
+            break;
+        
+        case 'LTC':
+            LTCDaily.find({}).sort('-time').limit(1).exec((error, result) => {
+                if (result != null && result.length > 0) {
+                    return res.status(200).json({
+                        status: 'OK',
+                        code: 0,
+                        msg: result
+                    })
+
+                } else {
+                    return res.status(500).json({
+                        status: 'ERROR',
+                        code: -1,
+                        msg: 'An error has ocurred ' + error 
+                    })
+                }
+            });
+            break;
+        
+        case 'XRP':
+            XRPDaily.find({}).sort('-time').limit(1).exec((error, result) => {
+                if (result != null && result.length > 0) {
+                    return res.status(200).json({
+                        status: 'OK',
+                        code: 0,
+                        msg: result
+                    })
+
+                } else {
+                    return res.status(500).json({
+                        status: 'ERROR',
+                        code: -1,
+                        msg: 'An error has ocurred ' + error 
+                    })
+                }
+            });
+            break;
+        default:
+            return res.status(300).json({
+                status: 'ERROR',
+                code: 1,
+                msg: 'Symbol is not correct'
+            });
+            break;
+   }
+});
+
+// Get prices up to 3 months ago
+router.get('/symbol/:symbol/dailychart', async (req, res) => {
+    var symbol = req.params.symbol;
+
+    var last_date = moment();
+    var start_date = moment().subtract(3, 'months');
+
+    switch (symbol) {
+        case 'ADA':
+            ADA.find({
+                start_time: {
+                    $gte: start_date
+                },
+                close_time: {
+                    $lte: last_date
+                }
+            }).sort('start_date').exec((error, result) => {
+                if (result != null && result.length > 0) {
+                    return res.status(200).json({
+                        status: 'OK',
+                        code: 0,
+                        msg: result
+                    })
+
+                } else {
+                    return res.status(500).json({
+                        status: 'ERROR',
+                        code: -1,
+                        msg: 'An error has ocurred ' + error 
+                    })
+                }
+            });
+            break;
+        
+        case 'BCH':
+            BCH.find({
+                start_time: {
+                    $gte: start_date
+                },
+                close_time: {
+                    $lte: last_date
+                }
+            }).sort('start_date').exec((error, result) => {
+                if (result != null && result.length > 0) {
+                    return res.status(200).json({
+                        status: 'OK',
+                        code: 0,
+                        msg: result
+                    })
+
+                } else {
+                    return res.status(500).json({
+                        status: 'ERROR',
+                        code: -1,
+                        msg: 'An error has ocurred ' + error 
+                    })
+                }
+            });
+            break;
+        
+        case 'BNB':
+            BNB.find({
+                start_time: {
+                    $gte: start_date
+                },
+                close_time: {
+                    $lte: last_date
+                }
+            }).sort('start_date').exec((error, result) => {
+                if (result != null && result.length > 0) {
+                    return res.status(200).json({
+                        status: 'OK',
+                        code: 0,
+                        msg: result
+                    })
+
+                } else {
+                    return res.status(500).json({
+                        status: 'ERROR',
+                        code: -1,
+                        msg: 'An error has ocurred ' + error 
+                    })
+                }
+            });
+            break;
+        
+        case 'BTC':
+            BTC.find({
+                start_time: {
+                    $gte: start_date
+                },
+                close_time: {
+                    $lte: last_date
+                }
+            }).sort('start_date').exec((error, result) => {
+                if (result != null && result.length > 0) {
+                    return res.status(200).json({
+                        status: 'OK',
+                        code: 0,
+                        msg: result
+                    })
+
+                } else {
+                    return res.status(500).json({
+                        status: 'ERROR',
+                        code: -1,
+                        msg: 'An error has ocurred ' + error 
+                    })
+                }
+            });
+            break;
+        
+        case 'DOT':
+            DOT.find({
+                start_time: {
+                    $gte: start_date
+                },
+                close_time: {
+                    $lte: last_date
+                }
+            }).sort('start_date').exec((error, result) => {
+                if (result != null && result.length > 0) {
+                    return res.status(200).json({
+                        status: 'OK',
+                        code: 0,
+                        msg: result
+                    })
+
+                } else {
+                    return res.status(500).json({
+                        status: 'ERROR',
+                        code: -1,
+                        msg: 'An error has ocurred ' + error 
+                    })
+                }
+            });
+            break;
+        
+        case 'ETH':
+            ETH.find({
+                start_time: {
+                    $gte: start_date
+                },
+                close_time: {
+                    $lte: last_date
+                }
+            }).sort('start_date').exec((error, result) => {
+                if (result != null && result.length > 0) {
+                    return res.status(200).json({
+                        status: 'OK',
+                        code: 0,
+                        msg: result
+                    })
+
+                } else {
+                    return res.status(500).json({
+                        status: 'ERROR',
+                        code: -1,
+                        msg: 'An error has ocurred ' + error 
+                    })
+                }
+            });
+            break;
+        
+        case 'LINK':
+            LINK.find({
+                start_time: {
+                    $gte: start_date
+                },
+                close_time: {
+                    $lte: last_date
+                }
+            }).sort('start_date').exec((error, result) => {
+                if (result != null && result.length > 0) {
+                    return res.status(200).json({
+                        status: 'OK',
+                        code: 0,
+                        msg: result
+                    })
+
+                } else {
+                    return res.status(500).json({
+                        status: 'ERROR',
+                        code: -1,
+                        msg: 'An error has ocurred ' + error 
+                    })
+                }
+            });
+            break;
+        
+        case 'LTC':
+            LTC.find({
+                start_time: {
+                    $gte: start_date
+                },
+                close_time: {
+                    $lte: last_date
+                }
+            }).sort('start_date').exec((error, result) => {
+                if (result != null && result.length > 0) {
+                    return res.status(200).json({
+                        status: 'OK',
+                        code: 0,
+                        msg: result
+                    })
+
+                } else {
+                    return res.status(500).json({
+                        status: 'ERROR',
+                        code: -1,
+                        msg: 'An error has ocurred ' + error 
+                    })
+                }
+            });
+            break;
+        
+        case 'XRP':
+            XRP.find({
+                start_time: {
+                    $gte: start_date
+                },
+                close_time: {
+                    $lte: last_date
+                }
+            }).sort('start_date').exec((error, result) => {
+                if (result != null && result.length > 0) {
+                    return res.status(200).json({
+                        status: 'OK',
+                        code: 0,
+                        msg: result
+                    })
+
+                } else {
+                    return res.status(500).json({
+                        status: 'ERROR',
+                        code: -1,
+                        msg: 'An error has ocurred ' + error 
+                    })
+                }
+            });
+            break;
+   }
+});
+
+// Get prices and create intervals for data
+router.post('/symbol/:symbol/daily', async (req, res) => {
+    var symbol = req.params.symbol;
+    var msg = [];
+    if (req.body.interval != null) {
+        var interval = undefined;
+        var hour = false;
+        switch (req.body.interval) {
+            case '5m':
+                interval = 5;
+                break;
+
+            case '15m':
+                interval = 15;
+                break;
+
+            case '30m':
+                interval = 30;
+                break;
+
+            case '1h':
+                interval = 1;
+                hour = true;
+                break;
+
+            case '4h':
+                interval = 4;
+                hour = true;
+                break;
+
+            case '12h':
+                interval = 12;
+                hour = true;
+                break;
+        }
+
+        console.log(interval);
+
+        switch (symbol) {
+            case 'ADA':
+                ADADaily.find({}).sort('time').exec((error, result) => {
+                    if (result != null && result.length > 0) {
+                        var interval_start, interval_end = undefined;
+                        var price_start, price_end, highest = 0;
+                        var lowest = Infinity;
+
+                        if (!hour) { // Interval is in minutes
+                            result.forEach(re => {
+                                if (interval_start == undefined) {
+                                    interval_start = new Date(re.time);
+                                    price_start = re.price;
+                                    lowest = re.price;
+                                    highest = re.price;
+                                } else {
+                                    if ((new Date(re.time).getMinutes() == ((interval_start.getMinutes() + interval) % 60)) && (new Date(re.time).getSeconds() >= interval_start.getSeconds())) {
+                                        interval_end = new Date(re.time);
+                                        price_end = re.price;
+                                        if (re.price < lowest) lowest = re.price;
+                                        if (re.price > highest) highest = re.price;
+                                        msg.push({
+                                            start_time: interval_start,
+                                            close_time: interval_end,
+                                            open_price: price_start,
+                                            close_price: price_end,
+                                            highest: highest,
+                                            lowest: lowest
+                                        });
+                                        interval_start = new Date(re.time);
+                                    } else {
+                                        if ((new Date(re.time).getMinutes() <= ((interval_start.getMinutes() + interval) % 60)) && (new Date(re.time).getSeconds() < interval_start.getSeconds())) {
+                                            if (re.price < lowest) lowest = re.price;
+                                            if (re.price > highest) highest = re.price;
+                                        }
+                                    }
+                                }
+                            });
+
+                            console.log('MSG Length: ' + msg.length);
+                            return res.status(200).json({
+                                status: 'OK',
+                                code: 0,
+                                msg: msg
+                            });
+                        } else { // Interval is in hours
+                            result.forEach(re => {
+                                if (interval_start == undefined) {
+                                    interval_start = new Date(re.time);
+                                    price_start = re.price;
+                                    lowest = re.price;
+                                    highest = re.price;
+                                } else {
+                                    if ((new Date(re.time).getHours() == ((interval_start.getHours() + interval) % 24)) && (new Date(re.time).getSeconds() >= interval_start.getSeconds())) {
+                                        interval_end = new Date(re.time);
+                                        price_end = re.price;
+                                        if (re.price < lowest) lowest = re.price;
+                                        if (re.price > highest) highest = re.price;
+                                        msg.push({
+                                            start_time: interval_start,
+                                            close_time: interval_end,
+                                            open_price: price_start,
+                                            close_price: price_end,
+                                            highest: highest,
+                                            lowest: lowest
+                                        });
+                                        interval_start = new Date(re.time);
+                                    } else {
+                                        if ((new Date(re.time).getHours() <= ((interval_start.getHours() + interval) % 24)) && (new Date(re.time).getSeconds() < interval_start.getSeconds())) {
+                                            if (re.price < lowest) lowest = re.price;
+                                            if (re.price > highest) highest = re.price;
+                                        }
+                                    }
+                                }
+                            });
+
+                            console.log('MSG Length: ' + msg.length);
+                            return res.status(200).json({
+                                status: 'OK',
+                                code: 0,
+                                msg: msg
+                            });
+                        }
+                    } else {
+                        return res.status(500).json({
+                            status: 'ERROR',
+                            code: -1,
+                            msg: 'An error has ocurred ' + error 
+                        })
+                    }
+                });
+                break;
+            
+            case 'BCH':
+                BCHDaily.find({}).sort('time').exec((error, result) => {
+                    if (result != null && result.length > 0) {
+                        return res.status(200).json({
+                            status: 'OK',
+                            code: 0,
+                            msg: result
+                        })
+
+                    } else {
+                        return res.status(500).json({
+                            status: 'ERROR',
+                            code: -1,
+                            msg: 'An error has ocurred ' + error 
+                        })
+                    }
+                });
+                break;
+            
+            case 'BNB':
+                BNBDaily.find({}).sort('time').exec((error, result) => {
+                    if (result != null && result.length > 0) {
+                        return res.status(200).json({
+                            status: 'OK',
+                            code: 0,
+                            msg: result
+                        })
+
+                    } else {
+                        return res.status(500).json({
+                            status: 'ERROR',
+                            code: -1,
+                            msg: 'An error has ocurred ' + error 
+                        })
+                    }
+                });
+                break;
+
+            
+            case 'BTC':
+                BTCDaily.find({}).sort('time').exec((error, result) => {
+                    if (result != null && result.length > 0) {
+                        return res.status(200).json({
+                            status: 'OK',
+                            code: 0,
+                            msg: result
+                        })
+
+                    } else {
+                        return res.status(500).json({
+                            status: 'ERROR',
+                            code: -1,
+                            msg: 'An error has ocurred ' + error 
+                        })
+                    }
+                });
+                break;
+            
+            case 'DOT':
+                DOTDaily.find({}).sort('time').exec((error, result) => {
+                    if (result != null && result.length > 0) {
+                        return res.status(200).json({
+                            status: 'OK',
+                            code: 0,
+                            msg: result
+                        })
+
+                    } else {
+                        return res.status(500).json({
+                            status: 'ERROR',
+                            code: -1,
+                            msg: 'An error has ocurred ' + error 
+                        })
+                    }
+                });
+                break;
+            
+            case 'ETH':
+                ETHDaily.find({}).sort('time').exec((error, result) => {
+                    if (result != null && result.length > 0) {
+                        return res.status(200).json({
+                            status: 'OK',
+                            code: 0,
+                            msg: result
+                        })
+
+                    } else {
+                        return res.status(500).json({
+                            status: 'ERROR',
+                            code: -1,
+                            msg: 'An error has ocurred ' + error 
+                        })
+                    }
+                });
+                break;
+            
+            case 'LINK':
+                LINKDaily.find({}).sort('time').exec((error, result) => {
+                    if (result != null && result.length > 0) {
+                        return res.status(200).json({
+                            status: 'OK',
+                            code: 0,
+                            msg: result
+                        })
+
+                    } else {
+                        return res.status(500).json({
+                            status: 'ERROR',
+                            code: -1,
+                            msg: 'An error has ocurred ' + error 
+                        })
+                    }
+                });
+                break;
+            
+            case 'LTC':
+                LTCDaily.find({}).sort('time').exec((error, result) => {
+                    if (result != null && result.length > 0) {
+                        return res.status(200).json({
+                            status: 'OK',
+                            code: 0,
+                            msg: result
+                        })
+
+                    } else {
+                        return res.status(500).json({
+                            status: 'ERROR',
+                            code: -1,
+                            msg: 'An error has ocurred ' + error 
+                        })
+                    }
+                });
+                break;
+            
+            case 'XRP':
+                XRPDaily.find({}).sort('time').exec((error, result) => {
+                    if (result != null && result.length > 0) {
+                        return res.status(200).json({
+                            status: 'OK',
+                            code: 0,
+                            msg: result
+                        })
+
+                    } else {
+                        return res.status(500).json({
+                            status: 'ERROR',
+                            code: -1,
+                            msg: 'An error has ocurred ' + error 
+                        })
+                    }
+                });
+                break;
+            
+            default:
+                return res.status(300).json({
+                    status: 'ERROR',
+                    code: 1,
+                    msg: 'Symbol is not correct'
+                });
+                break;
+        }
+    } else {
+        return res.status(500).json({
+            status: 'ERROR',
+            code: 1,
+            msg: 'Interval is not set'
+        })
+    }
+});
+
 
 module.exports = router;

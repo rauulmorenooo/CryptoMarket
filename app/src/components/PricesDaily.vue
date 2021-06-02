@@ -1,5 +1,5 @@
 <template>
-    <div style="height: 85vh">
+    <div>
         <b-table striped bordered small hover no-border-collapse :items="items"></b-table>
     </div>
 </template>
@@ -46,19 +46,19 @@
 
                             if (price > prices[i]) {
                                 variant = 'success';
-                                sPrice = price.toString() + ' $';
+                                sPrice = price.toString();
                             } else {
                                 if (price < prices[i]) {
                                     variant = 'danger';
-                                    sPrice = price.toString() + ' $';
+                                    sPrice = price.toString();
                                 } else {
                                     variant = 'success';
-                                    sPrice = price.toString() + ' $';
+                                    sPrice = price.toString();
                                 }
                             } 
                         }
                         previousPrices = prices;
-                        this.items.push({"Símbolo": symbol, "Precio ($)": sPrice, _cellVariants: { "Precio ($)": variant } });
+                        this.items.push({"Símbolo": symbol, "Precio ($)": sPrice + ' $', _cellVariants: { "Precio ($)": variant } });
 
                     });
                 });

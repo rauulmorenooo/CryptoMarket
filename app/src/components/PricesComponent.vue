@@ -1,8 +1,8 @@
 <template>
-    <div style="height: 85vh">
-        <div>
-            <b-button id="historico" :status='selected_hist' :variant="historico" @click="select">Histórico</b-button>
-            <b-button id="diario" :status='selected_diario' :variant="diario" @click="select">Diario</b-button>
+    <div class="content-cryptomarket">
+        <div class="table-father">
+            <b-button class="btn-table" id="historico" :status='selected_hist' :variant="historico" @click="select">Histórico</b-button>
+            <b-button class="btn-table" id="diario" :status='selected_diario' :variant="diario" @click="select">Diario</b-button>
         </div>
 
         <div v-if="selected_hist">

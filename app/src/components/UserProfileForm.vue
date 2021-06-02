@@ -1,5 +1,5 @@
 <template>
-    <div class="d-flex flex-column align-items-center">
+    <div class="d-flex flex-column align-items-center content-cryptomarket" style="height: 85vh">
         <div v-if="error" class="text-danger">
             <li v-for="error in errors" :key="error.msg">
                 {{error.msg}}
