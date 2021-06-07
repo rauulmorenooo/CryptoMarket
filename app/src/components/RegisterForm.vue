@@ -235,7 +235,9 @@ export default {
                 this.$http({
                     url: 'http://api.rmoreno.me/user',
                     method: 'post',
-                    headers: {'Content-type': 'application/json'},
+                    headers: {'Content-type':'application/json',
+                              'Access-Control-Allow-Origin': '*'
+                              },
                     data: {
                         fname: this.form.firstname,
                         lname: this.form.lastname,

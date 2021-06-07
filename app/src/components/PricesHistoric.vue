@@ -74,7 +74,9 @@
                 this.$http({
                     url: 'http://api.rmoreno.me/symbol/' + this.crypto + '/historic',
                     method: 'post',
-                    headers: {'Content-type': 'application/json'},
+                    headers: {'Content-type':'application/json',
+                              'Access-Control-Allow-Origin': '*'
+                              },
                     data: {
                         fdate: from,
                         ldate: to

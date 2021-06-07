@@ -1,5 +1,5 @@
 <template>
-  <div class="home">
+  <div>
     <NavBar />
     <Charts />
     <Footer />
@@ -17,6 +17,9 @@ export default {
     'NavBar': NavBar,
     'Charts': Charts,
     'Footer': Footer
+  },
+  mounted: function() {
+    document.title = "Inicio - Crypto Market";
   }
 }
 </script>

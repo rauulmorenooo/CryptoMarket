@@ -9,6 +9,7 @@ const userSchema = new Schema({
     email: String,
     password: String,
     investments: Array,
+    credits: Number,
     creationDate: Date
 });
 

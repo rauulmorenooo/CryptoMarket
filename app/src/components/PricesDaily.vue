@@ -20,7 +20,9 @@
                 this.$http({
                     url: 'http://api.rmoreno.me/symbol',
                     method: 'get',
-                    headers: {'Content-type': 'application/json'},
+                    headers: {'Content-type':'application/json',
+                              'Access-Control-Allow-Origin': '*'
+                              },
                 }).then((res) => {
                     var prices = previousPrices;
                     this.items = [];

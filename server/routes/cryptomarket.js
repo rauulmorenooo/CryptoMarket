@@ -2,10 +2,12 @@
 import express from 'express';
 import bcrypt from 'bcrypt-nodejs';
 const mongoose = require('mongoose');
+const ObjectID = require('mongodb').ObjectID;
 const moment = require('moment');
 
 // User imports
 import User from '../models/user';
+import Investment from '../models/investment';
 import { isValidFirstName, isValidLastName, isValidUsername, 
         isValidEmail, isValidPassword } from '../services/Validator';
 
@@ -145,7 +147,8 @@ router.post('/user', async (req, res) => {
                         username: req.body.username,
                         email: req.body.email,
                         password: hash,
-                        creationDate: new Date().getDate()
+                        creationDate: new Date().getDate(),
+                        credits: 25000
                     }, (err, result) => {
                         if (err) return console.log(err);
                         console.log('Inserted document with ID: ' + result.id); // TODO: Remove when deploying to prod.
@@ -937,7 +940,6 @@ router.get('/symbol/:symbol/lastest', async (req, res) => {
                 code: 1,
                 msg: 'Symbol is not correct'
             });
-            break;
    }
 });
 
@@ -1252,7 +1254,8 @@ router.post('/symbol/:symbol/daily', async (req, res) => {
                                             highest: highest,
                                             lowest: lowest
                                         });
-                                        interval_start = new Date(re.time);
+                                        // interval_start = new Date(re.time);
+                                        interval_start = undefined;
                                     } else {
                                         if ((new Date(re.time).getMinutes() <= ((interval_start.getMinutes() + interval) % 60)) && (new Date(re.time).getSeconds() < interval_start.getSeconds())) {
                                             if (re.price < lowest) lowest = re.price;
@@ -1289,7 +1292,8 @@ router.post('/symbol/:symbol/daily', async (req, res) => {
                                             highest: highest,
                                             lowest: lowest
                                         });
-                                        interval_start = new Date(re.time);
+                                        // interval_start = new Date(re.time);
+                                        interval_start = undefined;
                                     } else {
                                         if ((new Date(re.time).getHours() <= ((interval_start.getHours() + interval) % 24)) && (new Date(re.time).getSeconds() < interval_start.getSeconds())) {
                                             if (re.price < lowest) lowest = re.price;
@@ -1319,12 +1323,87 @@ router.post('/symbol/:symbol/daily', async (req, res) => {
             case 'BCH':
                 BCHDaily.find({}).sort('time').exec((error, result) => {
                     if (result != null && result.length > 0) {
-                        return res.status(200).json({
-                            status: 'OK',
-                            code: 0,
-                            msg: result
-                        })
+                        var interval_start, interval_end = undefined;
+                        var price_start, price_end, highest = 0;
+                        var lowest = Infinity;
 
+                        if (!hour) { // Interval is in minutes
+                            result.forEach(re => {
+                                if (interval_start == undefined) {
+                                    interval_start = new Date(re.time);
+                                    price_start = re.price;
+                                    lowest = re.price;
+                                    highest = re.price;
+                                } else {
+                                    if ((new Date(re.time).getMinutes() == ((interval_start.getMinutes() + interval) % 60)) && (new Date(re.time).getSeconds() >= interval_start.getSeconds())) {
+                                        interval_end = new Date(re.time);
+                                        price_end = re.price;
+                                        if (re.price < lowest) lowest = re.price;
+                                        if (re.price > highest) highest = re.price;
+                                        msg.push({
+                                            start_time: interval_start,
+                                            close_time: interval_end,
+                                            open_price: price_start,
+                                            close_price: price_end,
+                                            highest: highest,
+                                            lowest: lowest
+                                        });
+                                        // interval_start = new Date(re.time);
+                                        interval_start = undefined;
+                                    } else {
+                                        if ((new Date(re.time).getMinutes() <= ((interval_start.getMinutes() + interval) % 60)) && (new Date(re.time).getSeconds() < interval_start.getSeconds())) {
+                                            if (re.price < lowest) lowest = re.price;
+                                            if (re.price > highest) highest = re.price;
+                                        }
+                                    }
+                                }
+                            });
+
+                            console.log('MSG Length: ' + msg.length);
+                            return res.status(200).json({
+                                status: 'OK',
+                                code: 0,
+                                msg: msg
+                            });
+                        } else { // Interval is in hours
+                            result.forEach(re => {
+                                if (interval_start == undefined) {
+                                    interval_start = new Date(re.time);
+                                    price_start = re.price;
+                                    lowest = re.price;
+                                    highest = re.price;
+                                } else {
+                                    if ((new Date(re.time).getHours() == ((interval_start.getHours() + interval) % 24)) && (new Date(re.time).getSeconds() >= interval_start.getSeconds())) {
+                                        interval_end = new Date(re.time);
+                                        price_end = re.price;
+                                        if (re.price < lowest) lowest = re.price;
+                                        if (re.price > highest) highest = re.price;
+                                        msg.push({
+                                            start_time: interval_start,
+                                            close_time: interval_end,
+                                            open_price: price_start,
+                                            close_price: price_end,
+                                            highest: highest,
+                                            lowest: lowest
+                                        });
+                                        // interval_start = new Date(re.time);
+                                        interval_start = undefined;
+                                    } else {
+                                        if ((new Date(re.time).getHours() <= ((interval_start.getHours() + interval) % 24)) && (new Date(re.time).getSeconds() < interval_start.getSeconds())) {
+                                            if (re.price < lowest) lowest = re.price;
+                                            if (re.price > highest) highest = re.price;
+                                        }
+                                    }
+                                }
+                            });
+
+                            console.log('MSG Length: ' + msg.length);
+                            return res.status(200).json({
+                                status: 'OK',
+                                code: 0,
+                                msg: msg
+                            });
+                        }
                     } else {
                         return res.status(500).json({
                             status: 'ERROR',
@@ -1338,12 +1417,87 @@ router.post('/symbol/:symbol/daily', async (req, res) => {
             case 'BNB':
                 BNBDaily.find({}).sort('time').exec((error, result) => {
                     if (result != null && result.length > 0) {
-                        return res.status(200).json({
-                            status: 'OK',
-                            code: 0,
-                            msg: result
-                        })
+                        var interval_start, interval_end = undefined;
+                        var price_start, price_end, highest = 0;
+                        var lowest = Infinity;
 
+                        if (!hour) { // Interval is in minutes
+                            result.forEach(re => {
+                                if (interval_start == undefined) {
+                                    interval_start = new Date(re.time);
+                                    price_start = re.price;
+                                    lowest = re.price;
+                                    highest = re.price;
+                                } else {
+                                    if ((new Date(re.time).getMinutes() == ((interval_start.getMinutes() + interval) % 60)) && (new Date(re.time).getSeconds() >= interval_start.getSeconds())) {
+                                        interval_end = new Date(re.time);
+                                        price_end = re.price;
+                                        if (re.price < lowest) lowest = re.price;
+                                        if (re.price > highest) highest = re.price;
+                                        msg.push({
+                                            start_time: interval_start,
+                                            close_time: interval_end,
+                                            open_price: price_start,
+                                            close_price: price_end,
+                                            highest: highest,
+                                            lowest: lowest
+                                        });
+                                        // interval_start = new Date(re.time);
+                                        interval_start = undefined;
+                                    } else {
+                                        if ((new Date(re.time).getMinutes() <= ((interval_start.getMinutes() + interval) % 60)) && (new Date(re.time).getSeconds() < interval_start.getSeconds())) {
+                                            if (re.price < lowest) lowest = re.price;
+                                            if (re.price > highest) highest = re.price;
+                                        }
+                                    }
+                                }
+                            });
+
+                            console.log('MSG Length: ' + msg.length);
+                            return res.status(200).json({
+                                status: 'OK',
+                                code: 0,
+                                msg: msg
+                            });
+                        } else { // Interval is in hours
+                            result.forEach(re => {
+                                if (interval_start == undefined) {
+                                    interval_start = new Date(re.time);
+                                    price_start = re.price;
+                                    lowest = re.price;
+                                    highest = re.price;
+                                } else {
+                                    if ((new Date(re.time).getHours() == ((interval_start.getHours() + interval) % 24)) && (new Date(re.time).getSeconds() >= interval_start.getSeconds())) {
+                                        interval_end = new Date(re.time);
+                                        price_end = re.price;
+                                        if (re.price < lowest) lowest = re.price;
+                                        if (re.price > highest) highest = re.price;
+                                        msg.push({
+                                            start_time: interval_start,
+                                            close_time: interval_end,
+                                            open_price: price_start,
+                                            close_price: price_end,
+                                            highest: highest,
+                                            lowest: lowest
+                                        });
+                                        // interval_start = new Date(re.time);
+                                        interval_start = undefined;
+                                    } else {
+                                        if ((new Date(re.time).getHours() <= ((interval_start.getHours() + interval) % 24)) && (new Date(re.time).getSeconds() < interval_start.getSeconds())) {
+                                            if (re.price < lowest) lowest = re.price;
+                                            if (re.price > highest) highest = re.price;
+                                        }
+                                    }
+                                }
+                            });
+
+                            console.log('MSG Length: ' + msg.length);
+                            return res.status(200).json({
+                                status: 'OK',
+                                code: 0,
+                                msg: msg
+                            });
+                        }
                     } else {
                         return res.status(500).json({
                             status: 'ERROR',
@@ -1358,12 +1512,87 @@ router.post('/symbol/:symbol/daily', async (req, res) => {
             case 'BTC':
                 BTCDaily.find({}).sort('time').exec((error, result) => {
                     if (result != null && result.length > 0) {
-                        return res.status(200).json({
-                            status: 'OK',
-                            code: 0,
-                            msg: result
-                        })
+                        var interval_start, interval_end = undefined;
+                        var price_start, price_end, highest = 0;
+                        var lowest = Infinity;
 
+                        if (!hour) { // Interval is in minutes
+                            result.forEach(re => {
+                                if (interval_start == undefined) {
+                                    interval_start = new Date(re.time);
+                                    price_start = re.price;
+                                    lowest = re.price;
+                                    highest = re.price;
+                                } else {
+                                    if ((new Date(re.time).getMinutes() == ((interval_start.getMinutes() + interval) % 60)) && (new Date(re.time).getSeconds() >= interval_start.getSeconds())) {
+                                        interval_end = new Date(re.time);
+                                        price_end = re.price;
+                                        if (re.price < lowest) lowest = re.price;
+                                        if (re.price > highest) highest = re.price;
+                                        msg.push({
+                                            start_time: interval_start,
+                                            close_time: interval_end,
+                                            open_price: price_start,
+                                            close_price: price_end,
+                                            highest: highest,
+                                            lowest: lowest
+                                        });
+                                        // interval_start = new Date(re.time);
+                                        interval_start = undefined;
+                                    } else {
+                                        if ((new Date(re.time).getMinutes() <= ((interval_start.getMinutes() + interval) % 60)) && (new Date(re.time).getSeconds() < interval_start.getSeconds())) {
+                                            if (re.price < lowest) lowest = re.price;
+                                            if (re.price > highest) highest = re.price;
+                                        }
+                                    }
+                                }
+                            });
+
+                            console.log('MSG Length: ' + msg.length);
+                            return res.status(200).json({
+                                status: 'OK',
+                                code: 0,
+                                msg: msg
+                            });
+                        } else { // Interval is in hours
+                            result.forEach(re => {
+                                if (interval_start == undefined) {
+                                    interval_start = new Date(re.time);
+                                    price_start = re.price;
+                                    lowest = re.price;
+                                    highest = re.price;
+                                } else {
+                                    if ((new Date(re.time).getHours() == ((interval_start.getHours() + interval) % 24)) && (new Date(re.time).getSeconds() >= interval_start.getSeconds())) {
+                                        interval_end = new Date(re.time);
+                                        price_end = re.price;
+                                        if (re.price < lowest) lowest = re.price;
+                                        if (re.price > highest) highest = re.price;
+                                        msg.push({
+                                            start_time: interval_start,
+                                            close_time: interval_end,
+                                            open_price: price_start,
+                                            close_price: price_end,
+                                            highest: highest,
+                                            lowest: lowest
+                                        });
+                                        // interval_start = new Date(re.time);
+                                        interval_start = undefined;
+                                    } else {
+                                        if ((new Date(re.time).getHours() <= ((interval_start.getHours() + interval) % 24)) && (new Date(re.time).getSeconds() < interval_start.getSeconds())) {
+                                            if (re.price < lowest) lowest = re.price;
+                                            if (re.price > highest) highest = re.price;
+                                        }
+                                    }
+                                }
+                            });
+
+                            console.log('MSG Length: ' + msg.length);
+                            return res.status(200).json({
+                                status: 'OK',
+                                code: 0,
+                                msg: msg
+                            });
+                        }
                     } else {
                         return res.status(500).json({
                             status: 'ERROR',
@@ -1377,12 +1606,87 @@ router.post('/symbol/:symbol/daily', async (req, res) => {
             case 'DOT':
                 DOTDaily.find({}).sort('time').exec((error, result) => {
                     if (result != null && result.length > 0) {
-                        return res.status(200).json({
-                            status: 'OK',
-                            code: 0,
-                            msg: result
-                        })
+                        var interval_start, interval_end = undefined;
+                        var price_start, price_end, highest = 0;
+                        var lowest = Infinity;
 
+                        if (!hour) { // Interval is in minutes
+                            result.forEach(re => {
+                                if (interval_start == undefined) {
+                                    interval_start = new Date(re.time);
+                                    price_start = re.price;
+                                    lowest = re.price;
+                                    highest = re.price;
+                                } else {
+                                    if ((new Date(re.time).getMinutes() == ((interval_start.getMinutes() + interval) % 60)) && (new Date(re.time).getSeconds() >= interval_start.getSeconds())) {
+                                        interval_end = new Date(re.time);
+                                        price_end = re.price;
+                                        if (re.price < lowest) lowest = re.price;
+                                        if (re.price > highest) highest = re.price;
+                                        msg.push({
+                                            start_time: interval_start,
+                                            close_time: interval_end,
+                                            open_price: price_start,
+                                            close_price: price_end,
+                                            highest: highest,
+                                            lowest: lowest
+                                        });
+                                        // interval_start = new Date(re.time);
+                                        interval_start = undefined;
+                                    } else {
+                                        if ((new Date(re.time).getMinutes() <= ((interval_start.getMinutes() + interval) % 60)) && (new Date(re.time).getSeconds() < interval_start.getSeconds())) {
+                                            if (re.price < lowest) lowest = re.price;
+                                            if (re.price > highest) highest = re.price;
+                                        }
+                                    }
+                                }
+                            });
+
+                            console.log('MSG Length: ' + msg.length);
+                            return res.status(200).json({
+                                status: 'OK',
+                                code: 0,
+                                msg: msg
+                            });
+                        } else { // Interval is in hours
+                            result.forEach(re => {
+                                if (interval_start == undefined) {
+                                    interval_start = new Date(re.time);
+                                    price_start = re.price;
+                                    lowest = re.price;
+                                    highest = re.price;
+                                } else {
+                                    if ((new Date(re.time).getHours() == ((interval_start.getHours() + interval) % 24)) && (new Date(re.time).getSeconds() >= interval_start.getSeconds())) {
+                                        interval_end = new Date(re.time);
+                                        price_end = re.price;
+                                        if (re.price < lowest) lowest = re.price;
+                                        if (re.price > highest) highest = re.price;
+                                        msg.push({
+                                            start_time: interval_start,
+                                            close_time: interval_end,
+                                            open_price: price_start,
+                                            close_price: price_end,
+                                            highest: highest,
+                                            lowest: lowest
+                                        });
+                                        // interval_start = new Date(re.time);
+                                        interval_start = undefined;
+                                    } else {
+                                        if ((new Date(re.time).getHours() <= ((interval_start.getHours() + interval) % 24)) && (new Date(re.time).getSeconds() < interval_start.getSeconds())) {
+                                            if (re.price < lowest) lowest = re.price;
+                                            if (re.price > highest) highest = re.price;
+                                        }
+                                    }
+                                }
+                            });
+
+                            console.log('MSG Length: ' + msg.length);
+                            return res.status(200).json({
+                                status: 'OK',
+                                code: 0,
+                                msg: msg
+                            });
+                        }
                     } else {
                         return res.status(500).json({
                             status: 'ERROR',
@@ -1396,12 +1700,87 @@ router.post('/symbol/:symbol/daily', async (req, res) => {
             case 'ETH':
                 ETHDaily.find({}).sort('time').exec((error, result) => {
                     if (result != null && result.length > 0) {
-                        return res.status(200).json({
-                            status: 'OK',
-                            code: 0,
-                            msg: result
-                        })
+                        var interval_start, interval_end = undefined;
+                        var price_start, price_end, highest = 0;
+                        var lowest = Infinity;
 
+                        if (!hour) { // Interval is in minutes
+                            result.forEach(re => {
+                                if (interval_start == undefined) {
+                                    interval_start = new Date(re.time);
+                                    price_start = re.price;
+                                    lowest = re.price;
+                                    highest = re.price;
+                                } else {
+                                    if ((new Date(re.time).getMinutes() == ((interval_start.getMinutes() + interval) % 60)) && (new Date(re.time).getSeconds() >= interval_start.getSeconds())) {
+                                        interval_end = new Date(re.time);
+                                        price_end = re.price;
+                                        if (re.price < lowest) lowest = re.price;
+                                        if (re.price > highest) highest = re.price;
+                                        msg.push({
+                                            start_time: interval_start,
+                                            close_time: interval_end,
+                                            open_price: price_start,
+                                            close_price: price_end,
+                                            highest: highest,
+                                            lowest: lowest
+                                        });
+                                        // interval_start = new Date(re.time);
+                                        interval_start = undefined;
+                                    } else {
+                                        if ((new Date(re.time).getMinutes() <= ((interval_start.getMinutes() + interval) % 60)) && (new Date(re.time).getSeconds() < interval_start.getSeconds())) {
+                                            if (re.price < lowest) lowest = re.price;
+                                            if (re.price > highest) highest = re.price;
+                                        }
+                                    }
+                                }
+                            });
+
+                            console.log('MSG Length: ' + msg.length);
+                            return res.status(200).json({
+                                status: 'OK',
+                                code: 0,
+                                msg: msg
+                            });
+                        } else { // Interval is in hours
+                            result.forEach(re => {
+                                if (interval_start == undefined) {
+                                    interval_start = new Date(re.time);
+                                    price_start = re.price;
+                                    lowest = re.price;
+                                    highest = re.price;
+                                } else {
+                                    if ((new Date(re.time).getHours() == ((interval_start.getHours() + interval) % 24)) && (new Date(re.time).getSeconds() >= interval_start.getSeconds())) {
+                                        interval_end = new Date(re.time);
+                                        price_end = re.price;
+                                        if (re.price < lowest) lowest = re.price;
+                                        if (re.price > highest) highest = re.price;
+                                        msg.push({
+                                            start_time: interval_start,
+                                            close_time: interval_end,
+                                            open_price: price_start,
+                                            close_price: price_end,
+                                            highest: highest,
+                                            lowest: lowest
+                                        });
+                                        // interval_start = new Date(re.time);
+                                        interval_start = undefined;
+                                    } else {
+                                        if ((new Date(re.time).getHours() <= ((interval_start.getHours() + interval) % 24)) && (new Date(re.time).getSeconds() < interval_start.getSeconds())) {
+                                            if (re.price < lowest) lowest = re.price;
+                                            if (re.price > highest) highest = re.price;
+                                        }
+                                    }
+                                }
+                            });
+
+                            console.log('MSG Length: ' + msg.length);
+                            return res.status(200).json({
+                                status: 'OK',
+                                code: 0,
+                                msg: msg
+                            });
+                        }
                     } else {
                         return res.status(500).json({
                             status: 'ERROR',
@@ -1415,12 +1794,87 @@ router.post('/symbol/:symbol/daily', async (req, res) => {
             case 'LINK':
                 LINKDaily.find({}).sort('time').exec((error, result) => {
                     if (result != null && result.length > 0) {
-                        return res.status(200).json({
-                            status: 'OK',
-                            code: 0,
-                            msg: result
-                        })
+                        var interval_start, interval_end = undefined;
+                        var price_start, price_end, highest = 0;
+                        var lowest = Infinity;
 
+                        if (!hour) { // Interval is in minutes
+                            result.forEach(re => {
+                                if (interval_start == undefined) {
+                                    interval_start = new Date(re.time);
+                                    price_start = re.price;
+                                    lowest = re.price;
+                                    highest = re.price;
+                                } else {
+                                    if ((new Date(re.time).getMinutes() == ((interval_start.getMinutes() + interval) % 60)) && (new Date(re.time).getSeconds() >= interval_start.getSeconds())) {
+                                        interval_end = new Date(re.time);
+                                        price_end = re.price;
+                                        if (re.price < lowest) lowest = re.price;
+                                        if (re.price > highest) highest = re.price;
+                                        msg.push({
+                                            start_time: interval_start,
+                                            close_time: interval_end,
+                                            open_price: price_start,
+                                            close_price: price_end,
+                                            highest: highest,
+                                            lowest: lowest
+                                        });
+                                        // interval_start = new Date(re.time);
+                                        interval_start = undefined;
+                                    } else {
+                                        if ((new Date(re.time).getMinutes() <= ((interval_start.getMinutes() + interval) % 60)) && (new Date(re.time).getSeconds() < interval_start.getSeconds())) {
+                                            if (re.price < lowest) lowest = re.price;
+                                            if (re.price > highest) highest = re.price;
+                                        }
+                                    }
+                                }
+                            });
+
+                            console.log('MSG Length: ' + msg.length);
+                            return res.status(200).json({
+                                status: 'OK',
+                                code: 0,
+                                msg: msg
+                            });
+                        } else { // Interval is in hours
+                            result.forEach(re => {
+                                if (interval_start == undefined) {
+                                    interval_start = new Date(re.time);
+                                    price_start = re.price;
+                                    lowest = re.price;
+                                    highest = re.price;
+                                } else {
+                                    if ((new Date(re.time).getHours() == ((interval_start.getHours() + interval) % 24)) && (new Date(re.time).getSeconds() >= interval_start.getSeconds())) {
+                                        interval_end = new Date(re.time);
+                                        price_end = re.price;
+                                        if (re.price < lowest) lowest = re.price;
+                                        if (re.price > highest) highest = re.price;
+                                        msg.push({
+                                            start_time: interval_start,
+                                            close_time: interval_end,
+                                            open_price: price_start,
+                                            close_price: price_end,
+                                            highest: highest,
+                                            lowest: lowest
+                                        });
+                                        // interval_start = new Date(re.time);
+                                        interval_start = undefined;
+                                    } else {
+                                        if ((new Date(re.time).getHours() <= ((interval_start.getHours() + interval) % 24)) && (new Date(re.time).getSeconds() < interval_start.getSeconds())) {
+                                            if (re.price < lowest) lowest = re.price;
+                                            if (re.price > highest) highest = re.price;
+                                        }
+                                    }
+                                }
+                            });
+
+                            console.log('MSG Length: ' + msg.length);
+                            return res.status(200).json({
+                                status: 'OK',
+                                code: 0,
+                                msg: msg
+                            });
+                        }
                     } else {
                         return res.status(500).json({
                             status: 'ERROR',
@@ -1434,12 +1888,87 @@ router.post('/symbol/:symbol/daily', async (req, res) => {
             case 'LTC':
                 LTCDaily.find({}).sort('time').exec((error, result) => {
                     if (result != null && result.length > 0) {
-                        return res.status(200).json({
-                            status: 'OK',
-                            code: 0,
-                            msg: result
-                        })
+                        var interval_start, interval_end = undefined;
+                        var price_start, price_end, highest = 0;
+                        var lowest = Infinity;
 
+                        if (!hour) { // Interval is in minutes
+                            result.forEach(re => {
+                                if (interval_start == undefined) {
+                                    interval_start = new Date(re.time);
+                                    price_start = re.price;
+                                    lowest = re.price;
+                                    highest = re.price;
+                                } else {
+                                    if ((new Date(re.time).getMinutes() == ((interval_start.getMinutes() + interval) % 60)) && (new Date(re.time).getSeconds() >= interval_start.getSeconds())) {
+                                        interval_end = new Date(re.time);
+                                        price_end = re.price;
+                                        if (re.price < lowest) lowest = re.price;
+                                        if (re.price > highest) highest = re.price;
+                                        msg.push({
+                                            start_time: interval_start,
+                                            close_time: interval_end,
+                                            open_price: price_start,
+                                            close_price: price_end,
+                                            highest: highest,
+                                            lowest: lowest
+                                        });
+                                        // interval_start = new Date(re.time);
+                                        interval_start = undefined;
+                                    } else {
+                                        if ((new Date(re.time).getMinutes() <= ((interval_start.getMinutes() + interval) % 60)) && (new Date(re.time).getSeconds() < interval_start.getSeconds())) {
+                                            if (re.price < lowest) lowest = re.price;
+                                            if (re.price > highest) highest = re.price;
+                                        }
+                                    }
+                                }
+                            });
+
+                            console.log('MSG Length: ' + msg.length);
+                            return res.status(200).json({
+                                status: 'OK',
+                                code: 0,
+                                msg: msg
+                            });
+                        } else { // Interval is in hours
+                            result.forEach(re => {
+                                if (interval_start == undefined) {
+                                    interval_start = new Date(re.time);
+                                    price_start = re.price;
+                                    lowest = re.price;
+                                    highest = re.price;
+                                } else {
+                                    if ((new Date(re.time).getHours() == ((interval_start.getHours() + interval) % 24)) && (new Date(re.time).getSeconds() >= interval_start.getSeconds())) {
+                                        interval_end = new Date(re.time);
+                                        price_end = re.price;
+                                        if (re.price < lowest) lowest = re.price;
+                                        if (re.price > highest) highest = re.price;
+                                        msg.push({
+                                            start_time: interval_start,
+                                            close_time: interval_end,
+                                            open_price: price_start,
+                                            close_price: price_end,
+                                            highest: highest,
+                                            lowest: lowest
+                                        });
+                                        // interval_start = new Date(re.time);
+                                        interval_start = undefined;
+                                    } else {
+                                        if ((new Date(re.time).getHours() <= ((interval_start.getHours() + interval) % 24)) && (new Date(re.time).getSeconds() < interval_start.getSeconds())) {
+                                            if (re.price < lowest) lowest = re.price;
+                                            if (re.price > highest) highest = re.price;
+                                        }
+                                    }
+                                }
+                            });
+
+                            console.log('MSG Length: ' + msg.length);
+                            return res.status(200).json({
+                                status: 'OK',
+                                code: 0,
+                                msg: msg
+                            });
+                        }
                     } else {
                         return res.status(500).json({
                             status: 'ERROR',
@@ -1453,12 +1982,87 @@ router.post('/symbol/:symbol/daily', async (req, res) => {
             case 'XRP':
                 XRPDaily.find({}).sort('time').exec((error, result) => {
                     if (result != null && result.length > 0) {
-                        return res.status(200).json({
-                            status: 'OK',
-                            code: 0,
-                            msg: result
-                        })
+                        var interval_start, interval_end = undefined;
+                        var price_start, price_end, highest = 0;
+                        var lowest = Infinity;
 
+                        if (!hour) { // Interval is in minutes
+                            result.forEach(re => {
+                                if (interval_start == undefined) {
+                                    interval_start = new Date(re.time);
+                                    price_start = re.price;
+                                    lowest = re.price;
+                                    highest = re.price;
+                                } else {
+                                    if ((new Date(re.time).getMinutes() == ((interval_start.getMinutes() + interval) % 60)) && (new Date(re.time).getSeconds() >= interval_start.getSeconds())) {
+                                        interval_end = new Date(re.time);
+                                        price_end = re.price;
+                                        if (re.price < lowest) lowest = re.price;
+                                        if (re.price > highest) highest = re.price;
+                                        msg.push({
+                                            start_time: interval_start,
+                                            close_time: interval_end,
+                                            open_price: price_start,
+                                            close_price: price_end,
+                                            highest: highest,
+                                            lowest: lowest
+                                        });
+                                        // interval_start = new Date(re.time);
+                                        interval_start = undefined;
+                                    } else {
+                                        if ((new Date(re.time).getMinutes() <= ((interval_start.getMinutes() + interval) % 60)) && (new Date(re.time).getSeconds() < interval_start.getSeconds())) {
+                                            if (re.price < lowest) lowest = re.price;
+                                            if (re.price > highest) highest = re.price;
+                                        }
+                                    }
+                                }
+                            });
+
+                            console.log('MSG Length: ' + msg.length);
+                            return res.status(200).json({
+                                status: 'OK',
+                                code: 0,
+                                msg: msg
+                            });
+                        } else { // Interval is in hours
+                            result.forEach(re => {
+                                if (interval_start == undefined) {
+                                    interval_start = new Date(re.time);
+                                    price_start = re.price;
+                                    lowest = re.price;
+                                    highest = re.price;
+                                } else {
+                                    if ((new Date(re.time).getHours() == ((interval_start.getHours() + interval) % 24)) && (new Date(re.time).getSeconds() >= interval_start.getSeconds())) {
+                                        interval_end = new Date(re.time);
+                                        price_end = re.price;
+                                        if (re.price < lowest) lowest = re.price;
+                                        if (re.price > highest) highest = re.price;
+                                        msg.push({
+                                            start_time: interval_start,
+                                            close_time: interval_end,
+                                            open_price: price_start,
+                                            close_price: price_end,
+                                            highest: highest,
+                                            lowest: lowest
+                                        });
+                                        // interval_start = new Date(re.time);
+                                        interval_start = undefined;
+                                    } else {
+                                        if ((new Date(re.time).getHours() <= ((interval_start.getHours() + interval) % 24)) && (new Date(re.time).getSeconds() < interval_start.getSeconds())) {
+                                            if (re.price < lowest) lowest = re.price;
+                                            if (re.price > highest) highest = re.price;
+                                        }
+                                    }
+                                }
+                            });
+
+                            console.log('MSG Length: ' + msg.length);
+                            return res.status(200).json({
+                                status: 'OK',
+                                code: 0,
+                                msg: msg
+                            });
+                        }
                     } else {
                         return res.status(500).json({
                             status: 'ERROR',
@@ -1481,10 +2085,839 @@ router.post('/symbol/:symbol/daily', async (req, res) => {
         return res.status(500).json({
             status: 'ERROR',
             code: 1,
-            msg: 'Interval is not set'
+            msg: 'Interval must be set'
         })
     }
 });
 
+router.post('/symbol/:symbol/historical', async (req, res) => {
+    var symbol = req.params.symbol;
+    var msg = [];
+
+    if (req.body.interval != null) {
+        var interval = undefined;
+        
+        switch(req.body.interval) {
+            case '1m':
+                interval = 1;
+                break;
+
+            case '3m':
+                interval = 3;
+                break;
+
+            case '6m':
+                interval = 6;
+                break;
+
+            case '12m':
+                interval = 12;
+                break;
+
+            default:
+                return res.status(500).json({
+                    status: 'ERROR',
+                    code: 2,
+                    msg: 'Interval is incorrect'
+                });
+        }
+
+        var yesterday = moment().subtract(1, 'days');
+        yesterday.set('hours', 23);
+        yesterday.set('minute', 59);
+        yesterday.set('second', 59);
+        yesterday.set('millisecond', 999);
+
+        var start = moment().subtract(interval, 'months');
+        start.set('hours', 0);
+        start.set('minute', 0);
+        start.set('second', 0);
+        start.set('millisecond', 0);
+
+        switch (symbol) {
+            case 'ADA':
+                ADA.find({
+                    start_time: {
+                        $gte: start,
+                        $lte: yesterday
+                    },
+                    close_time: {
+                        $gte: start,
+                        $lte: yesterday
+                    }
+                }).sort('start_time').exec((error, result) => {
+                    if (result != null && result.length > 0) {
+                        return res.status(200).json({
+                            status: 'OK',
+                            code: 0,
+                            msg: result
+                        });
+                    } else {
+                        return res.status(500).json({
+                            status: 'ERROR',
+                            code: -1,
+                            msg: 'An error has ocurred' + error
+                        })
+                    }
+                });
+                break;
+            case 'BCH':
+                BCH.find({
+                    start_time: {
+                        $gte: start,
+                        $lte: yesterday
+                    },
+                    close_time: {
+                        $gte: start,
+                        $lte: yesterday
+                    }
+                }).sort('start_time').exec((error, result) => {
+                    if (result != null && result.length > 0) {
+                        return res.status(200).json({
+                            status: 'OK',
+                            code: 0,
+                            msg: result
+                        });
+                    } else {
+                        return res.status(500).json({
+                            status: 'ERROR',
+                            code: -1,
+                            msg: 'An error has ocurred' + error
+                        })
+                    }
+                });
+                break;
+            case 'BNB':
+                BNB.find({
+                    start_time: {
+                        $gte: start,
+                        $lte: yesterday
+                    },
+                    close_time: {
+                        $gte: start,
+                        $lte: yesterday
+                    }
+                }).sort('start_time').exec((error, result) => {
+                    if (result != null && result.length > 0) {
+                        return res.status(200).json({
+                            status: 'OK',
+                            code: 0,
+                            msg: result
+                        });
+                    } else {
+                        return res.status(500).json({
+                            status: 'ERROR',
+                            code: -1,
+                            msg: 'An error has ocurred' + error
+                        })
+                    }
+                });
+                break;
+            case 'BTC':
+                BTC.find({
+                    start_time: {
+                        $gte: start,
+                        $lte: yesterday
+                    },
+                    close_time: {
+                        $gte: start,
+                        $lte: yesterday
+                    }
+                }).sort('start_time').exec((error, result) => {
+                    if (result != null && result.length > 0) {
+                        return res.status(200).json({
+                            status: 'OK',
+                            code: 0,
+                            msg: result
+                        });
+                    } else {
+                        return res.status(500).json({
+                            status: 'ERROR',
+                            code: -1,
+                            msg: 'An error has ocurred' + error
+                        })
+                    }
+                });
+                break;
+            case 'DOT':
+                DOT.find({
+                    start_time: {
+                        $gte: start,
+                        $lte: yesterday
+                    },
+                    close_time: {
+                        $gte: start,
+                        $lte: yesterday
+                    }
+                }).sort('start_time').exec((error, result) => {
+                    if (result != null && result.length > 0) {
+                        return res.status(200).json({
+                            status: 'OK',
+                            code: 0,
+                            msg: result
+                        });
+                    } else {
+                        return res.status(500).json({
+                            status: 'ERROR',
+                            code: -1,
+                            msg: 'An error has ocurred' + error
+                        })
+                    }
+                });
+                break;
+            case 'ETH':
+                ETH.find({
+                    start_time: {
+                        $gte: start,
+                        $lte: yesterday
+                    },
+                    close_time: {
+                        $gte: start,
+                        $lte: yesterday
+                    }
+                }).sort('start_time').exec((error, result) => {
+                    if (result != null && result.length > 0) {
+                        return res.status(200).json({
+                            status: 'OK',
+                            code: 0,
+                            msg: result
+                        });
+                    } else {
+                        return res.status(500).json({
+                            status: 'ERROR',
+                            code: -1,
+                            msg: 'An error has ocurred' + error
+                        })
+                    }
+                });
+                break;
+            case 'LINK':
+                LINK.find({
+                    start_time: {
+                        $gte: start,
+                        $lte: yesterday
+                    },
+                    close_time: {
+                        $gte: start,
+                        $lte: yesterday
+                    }
+                }).sort('start_time').exec((error, result) => {
+                    if (result != null && result.length > 0) {
+                        return res.status(200).json({
+                            status: 'OK',
+                            code: 0,
+                            msg: result
+                        });
+                    } else {
+                        return res.status(500).json({
+                            status: 'ERROR',
+                            code: -1,
+                            msg: 'An error has ocurred' + error
+                        })
+                    }
+                });
+                break;
+            case 'LTC':
+                LTC.find({
+                    start_time: {
+                        $gte: start,
+                        $lte: yesterday
+                    },
+                    close_time: {
+                        $gte: start,
+                        $lte: yesterday
+                    }
+                }).sort('start_time').exec((error, result) => {
+                    if (result != null && result.length > 0) {
+                        return res.status(200).json({
+                            status: 'OK',
+                            code: 0,
+                            msg: result
+                        });
+                    } else {
+                        return res.status(500).json({
+                            status: 'ERROR',
+                            code: -1,
+                            msg: 'An error has ocurred' + error
+                        })
+                    }
+                });
+                break;
+            case 'XRP':
+                XRP.find({
+                    start_time: {
+                        $gte: start,
+                        $lte: yesterday
+                    },
+                    close_time: {
+                        $gte: start,
+                        $lte: yesterday
+                    }
+                }).sort('start_time').exec((error, result) => {
+                    if (result != null && result.length > 0) {
+                        return res.status(200).json({
+                            status: 'OK',
+                            code: 0,
+                            msg: result
+                        });
+                    } else {
+                        return res.status(500).json({
+                            status: 'ERROR',
+                            code: -1,
+                            msg: 'An error has ocurred' + error
+                        })
+                    }
+                });
+                break;
+            default:
+                return res.status(500).json({
+                    status: 'ERROR',
+                    code: 3,
+                    msg: 'The symbol is not correct'
+                })
+        }
+        
+    } else {
+        return res.status(500).json({
+            status: 'ERROR',
+            code: 1,
+            msg: 'Interval must be set'
+        });
+    }
+});
+
+router.post('/symbol/:symbol/historical/custom', async (req, res) => {
+    var symbol = req.params.symbol;
+
+    if (req.body.de != null && req.body.a != null) {
+        var start = new Date(req.body.de);
+        start = start.setHours(0, 0, 0, 0);
+        var end = new Date(req.body.a);
+        end = end.setHours(23, 59, 59, 999);
+        // TODO:Hacer cosas con las fechas antes de nada!!!!!!!! (00:00:00.000 && 23:59.59.999)
+        switch (symbol) {
+            case 'ADA':
+                ADA.find({
+                    start_time: {
+                        $gte: start,
+                        $lte: end
+                    },
+                    close_time: {
+                        $gte: start,
+                        $lte: end
+                    }
+                }).sort('start_time').exec((error, result) => {
+                    if (result != null && result.length > 0) {
+                        return res.status(200).json({
+                            status: 'OK',
+                            code: 0,
+                            msg: result
+                        });
+                    } else {
+                        return res.status(500).json({
+                            status: 'ERROR',
+                            code: -1,
+                            msg: 'An error has ocurred' + error
+                        })
+                    }
+                });
+                break;
+            case 'BCH':
+                BCH.find({
+                    start_time: {
+                        $gte: start,
+                        $lte: end
+                    },
+                    close_time: {
+                        $gte: start,
+                        $lte: end
+                    }
+                }).sort('start_time').exec((error, result) => {
+                    if (result != null && result.length > 0) {
+                        return res.status(200).json({
+                            status: 'OK',
+                            code: 0,
+                            msg: result
+                        });
+                    } else {
+                        return res.status(500).json({
+                            status: 'ERROR',
+                            code: -1,
+                            msg: 'An error has ocurred' + error
+                        })
+                    }
+                });
+                break;
+            case 'BNB':
+                BNB.find({
+                    start_time: {
+                        $gte: start,
+                        $lte: end
+                    },
+                    close_time: {
+                        $gte: start,
+                        $lte: end
+                    }
+                }).sort('start_time').exec((error, result) => {
+                    if (result != null && result.length > 0) {
+                        return res.status(200).json({
+                            status: 'OK',
+                            code: 0,
+                            msg: result
+                        });
+                    } else {
+                        return res.status(500).json({
+                            status: 'ERROR',
+                            code: -1,
+                            msg: 'An error has ocurred' + error
+                        })
+                    }
+                });
+                break;
+            case 'BTC':
+                BTC.find({
+                    start_time: {
+                        $gte: start,
+                        $lte: end
+                    },
+                    close_time: {
+                        $gte: start,
+                        $lte: end
+                    }
+                }).sort('start_time').exec((error, result) => {
+                    if (result != null && result.length > 0) {
+                        return res.status(200).json({
+                            status: 'OK',
+                            code: 0,
+                            msg: result
+                        });
+                    } else {
+                        return res.status(500).json({
+                            status: 'ERROR',
+                            code: -1,
+                            msg: 'An error has ocurred' + error
+                        })
+                    }
+                });
+                break;
+            case 'DOT':
+                DOT.find({
+                    start_time: {
+                        $gte: start,
+                        $lte: end
+                    },
+                    close_time: {
+                        $gte: start,
+                        $lte: end
+                    }
+                }).sort('start_time').exec((error, result) => {
+                    if (result != null && result.length > 0) {
+                        return res.status(200).json({
+                            status: 'OK',
+                            code: 0,
+                            msg: result
+                        });
+                    } else {
+                        return res.status(500).json({
+                            status: 'ERROR',
+                            code: -1,
+                            msg: 'An error has ocurred' + error
+                        })
+                    }
+                });
+                break;
+            case 'ETH':
+                ETH.find({
+                    start_time: {
+                        $gte: start,
+                        $lte: end
+                    },
+                    close_time: {
+                        $gte: start,
+                        $lte: end
+                    }
+                }).sort('start_time').exec((error, result) => {
+                    if (result != null && result.length > 0) {
+                        return res.status(200).json({
+                            status: 'OK',
+                            code: 0,
+                            msg: result
+                        });
+                    } else {
+                        return res.status(500).json({
+                            status: 'ERROR',
+                            code: -1,
+                            msg: 'An error has ocurred' + error
+                        })
+                    }
+                });
+                break;
+            case 'LINK':
+                LINK.find({
+                    start_time: {
+                        $gte: start,
+                        $lte: end
+                    },
+                    close_time: {
+                        $gte: start,
+                        $lte: end
+                    }
+                }).sort('start_time').exec((error, result) => {
+                    if (result != null && result.length > 0) {
+                        return res.status(200).json({
+                            status: 'OK',
+                            code: 0,
+                            msg: result
+                        });
+                    } else {
+                        return res.status(500).json({
+                            status: 'ERROR',
+                            code: -1,
+                            msg: 'An error has ocurred' + error
+                        })
+                    }
+                });
+                break;
+            case 'LTC':
+                LTC.find({
+                    start_time: {
+                        $gte: start,
+                        $lte: end
+                    },
+                    close_time: {
+                        $gte: start,
+                        $lte: end
+                    }
+                }).sort('start_time').exec((error, result) => {
+                    if (result != null && result.length > 0) {
+                        return res.status(200).json({
+                            status: 'OK',
+                            code: 0,
+                            msg: result
+                        });
+                    } else {
+                        return res.status(500).json({
+                            status: 'ERROR',
+                            code: -1,
+                            msg: 'An error has ocurred' + error
+                        })
+                    }
+                });
+                break;
+            case 'XRP':
+                XRP.find({
+                    start_time: {
+                        $gte: start,
+                        $lte: end
+                    },
+                    close_time: {
+                        $gte: start,
+                        $lte: end
+                    }
+                }).sort('start_time').exec((error, result) => {
+                    if (result != null && result.length > 0) {
+                        return res.status(200).json({
+                            status: 'OK',
+                            code: 0,
+                            msg: result
+                        });
+                    } else {
+                        return res.status(500).json({
+                            status: 'ERROR',
+                            code: -1,
+                            msg: 'An error has ocurred' + error
+                        })
+                    }
+                });
+                break;
+            default:
+                return res.status(500).json({
+                    status: 'ERROR',
+                    code: 3,
+                    msg: 'The symbol is not correct'
+                })
+        }
+    } else {
+        return res.status(500).json({
+            status: 'ERROR',
+            code: 1,
+            msg: 'Interval must be set'
+        });
+    }
+});
+
+// Get user credits
+router.get('/user/:id/credits', async (req, res) => {
+    var id = req.params.id;
+
+    User.findById(id, 'credits').exec((error, result) => {
+        if (error) {
+            return res.status(500).json({
+                status: 'ERROR',
+                code: 1,
+                msg: 'Interval must be set'
+            });
+        } else {
+            return res.status(200).json({
+                status: 'OK',
+                code: 0,
+                msg: result.credits
+            })
+        }
+    })
+});
+
+router.post('/user/:id/invest', async (req, res) => {
+    var id = req.params.id;
+
+    if (req.body.symbol != null && req.body.qty != null &&
+         req.body.price != null && req.body.creditos != null &&
+         req.body.date != null) {
+        await Investment.create({
+            user: id,
+            symbol: req.body.symbol,
+            date: new Date(req.body.date),
+            qty: req.body.qty,
+            price: req.body.price,
+            spent: req.body.creditos,
+            creationDate: new Date(),
+            won: 0,
+            closed: false
+        }, async (err, result) => {
+            if (err) return console.log(err);
+            console.log('Inserted document with ID: ' + result.id); // TODO: Remove when deploying to prod.
+            let creditos = 0;
+            let u = {};
+            let user = await User.findById(req.params.id, 'credits', (err, result) => {
+                creditos = result.credits;
+            });
+            console.log(user);
+
+            u.credits = creditos - parseInt(req.body.creditos);
+            console.log(u);
+
+            await user.updateOne(u, (err, result) => {
+                if (err) {
+                    res.status(500).json({
+                        status: 'ERROR',
+                        code: -1,
+                        msg: 'An error has occured ' + err
+                    });
+                }
+                
+                return res.status(200).json({
+                    status: 'OK',
+                    code: 0,
+                    msg: 'Inversion creada correctamente'
+                });
+            });
+
+            
+        });
+    } else {
+        return res.status(200).json({
+            status: 'OK',
+            code: 0,
+            msg: 'Request must contain a symbol, quanity and price'
+        });
+    }
+});
+
+
+router.get('/user/:id/investments', async (req, res) => {
+    var id = req.params.id;
+
+    Investment.find({
+        "user": id
+    }).exec((error, result) => {
+        if (error) {
+            return res.status(500).json({
+                status: 'ERROR',
+                code: -1,
+                msg: 'An error has ocurred ' + error
+            });
+        }
+        return res.status(200).json({
+            status: 'OK',
+            code: 0,
+            msg: result
+        })
+    })
+});
+
+router.put('/investment/:investment/close', async (req, res) => {
+    var user_id = undefined;
+    var invest = undefined;
+    var i = {
+        closed: true
+    };
+
+    if (req.body.actual != null) {
+        var investment = await Investment.findById(new ObjectID(req.params.investment), 'user qty', async (err, result) => {
+            invest = result;
+            user_id = result.user;
+        });
+
+        i.won = req.body.actual * invest.qty;
+
+        await investment.updateOne(i, async (err, r) => {
+            if (err) {
+                return res.status(500).json({
+                    status: 'ERROR',
+                    code: -1,
+                    msg: 'An error has occured ' + err
+                });
+            }
+
+            var u = {}
+            var credits = 0;
+            console.log(user_id);
+            var user = await User.findById(new ObjectID(user_id), 'credits', async(err, resu) => {
+                console.log('test');
+                console.log(resu);
+                credits = resu.credits;
+                console.log(credits);
+            });
+
+            console.log('nibba');
+            console.log(parseFloat(req.body.actual) * parseFloat(invest.qty));
+
+            u.credits = (credits + (parseFloat(req.body.actual) * parseFloat(invest.qty)));
+            console.log(u);
+
+            user.updateOne(u, (err, resul) => {
+                if (err) {
+                    return res.status(500).json({
+                        status: 'ERROR',
+                        code: -1,
+                        msg: 'An error has occured ' + err
+                    });
+                }
+
+                return res.status(200).json({
+                    status: 'OK',
+                    code: 0,
+                    msg: 'Investment ' + req.params.investment + ' closed'
+                });
+            });
+        })
+
+    } else {
+        return res.status(500).json({
+            status: 'ERROR',
+            code: 1,
+            msg: 'Actual price must be set'
+        });
+    }
+});
+
+router.get('/user/:id/addcredits', async (req, res) => {
+    var id = req.params.id;
+
+    console.log(id);
+
+    var u = {
+        credits: 2500
+    }
+
+    var user = await User.findById(id, 'credits', (err, result) => {
+        if (err) {
+            return res.status(500).json({
+                status: 'ERROR',
+                code: 1,
+                msg: 'An error has ocurred ' + err
+            });
+        }
+
+        u.credits += result.credits;
+    });
+
+    user.updateOne(u, (err, r) => {
+        if (err) {
+            return res.status(500).json({
+                status: 'ERROR',
+                code: 1,
+                msg: 'An error has ocurred ' + err
+            });
+        }
+
+        return res.status(200).json({
+            status: 'OK',
+            code: 0,
+            msg: 'Creditos añadidos correctamente'
+        });
+    })
+});
+
+router.post('/user/:id/investmultiple', async (req, res) => {
+    var id = req.params.id;
+    var investments = [];
+    var u = {
+        credits: 0
+    }
+    
+    if (req.body.inversiones != null) {
+        req.body.inversiones.forEach(i => {
+            investments.push({
+                user: id,
+                symbol: i.symbol,
+                date: i.date,
+                qty: i.qty,
+                price: i.price,
+                spent: i.spent,
+                won: 0,
+                creationDate: new Date(),
+                closed: false
+            });      
+        });
+
+        await Investment.insertMany(investments, async (error, docs) => {
+            if (docs.length == req.body.inversiones.length) {
+                var user = await User.findById(id, (err, result) => {
+                    if (err) {
+                        return res.status(500).json({
+                            status: 'ERROR',
+                            code: -1,
+                            msg: 'An error has ocurred'
+                        });
+                    }
+
+                    u.credits = result.credits;
+                });
+
+                u.credits = u.credits - req.body.total;
+
+                await user.updateOne(u, (err, r) => {
+                    if (err) {
+                        return res.status(500).json({
+                            status: 'ERROR',
+                            code: 1,
+                            msg: 'An error has ocurred ' + err
+                        });  
+                    }
+                })
+
+                return res.status(200).json({
+                    status: 'OK',
+                    code: 0,
+                    msg: 'Inversiones realizadas correctamente'
+                });
+            } else {
+                return res.status(500).json({
+                    status: 'ERROR',
+                    code: -1,
+                    msg: 'An error has ocurred'
+                });
+            }
+        });
+
+    } else {
+        return res.status(500).json({
+            status: 'ERROR',
+            code: -1,
+            msg: 'There are no investments'
+        });
+    }
+});
 
 module.exports = router;

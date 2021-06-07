@@ -18,6 +18,9 @@ export default {
         'NavBar': NavBar,
         'RegisterForm': RegisterForm,
         'Footer': Footer
+    },
+    mounted: function() {
+        document.title = "Registro - Crypto Market";
     }
 }
 

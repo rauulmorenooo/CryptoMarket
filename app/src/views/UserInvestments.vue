@@ -1,29 +1,29 @@
 <template>
     <div class="content-cryptomarket">
         <NavBar />
-        <UserProfileForm />
+        <UserInvestmentsComponent />
         <Footer />
     </div>
-    
+
 </template>
 
 <script>
 import NavBar from '../components/NavBar'
-import UserProfileForm from '../components/UserProfileForm'
+import UserInvestmentsComponent from '../components/UserInvestmentsComponent'
 import Footer from '../components/Footer'
 
 export default {
-    name: 'UserProfile',
+    name: 'UserInvestments',
     components: {
         'NavBar': NavBar,
-        'UserProfileForm': UserProfileForm,
+        'UserInvestmentsComponent': UserInvestmentsComponent,
         'Footer': Footer
     },
     mounted() {
         var logged = false;
         var user_id = '';
         
-        document.title = "Mi Perfil - Crypto Market";
+        document.title = "Mis Inversiones - Crypto Market";
 
         if (this.$cookies.isKey('logged')) logged = this.$cookies.get('logged');
         else {

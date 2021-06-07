@@ -1,5 +1,5 @@
 <template>
-    <div class="content-cryptomarket">
+    <div style="height: 85vh">
         <div class="table-father">
             <b-button class="btn-table" id="historico" :status='selected_hist' :variant="historico" @click="select">Histórico</b-button>
             <b-button class="btn-table" id="diario" :status='selected_diario' :variant="diario" @click="select">Diario</b-button>

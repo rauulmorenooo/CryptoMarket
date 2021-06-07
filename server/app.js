@@ -11,6 +11,8 @@ import cryptomarket from './routes/cryptomarket'
 const app = express();
 
 app.set('PORT', process.env.PORT || 3000);
+app.use(cors());
+app.options('*', cors());
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -18,7 +20,6 @@ app.use(express.urlencoded({ extended: true }));
 //app.use(express.static(path.join(__dirname, 'views')))
 app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(morgan('tiny'));
-app.use(cors());
 
 app.use('/', cryptomarket);
 

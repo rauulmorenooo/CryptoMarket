@@ -17,6 +17,9 @@ export default {
         'NavBar': NavBar,
         'LoginForm': LoginForm,
         'Footer': Footer
+    },
+    mounted: function() {
+        document.title = "Iniciar Sesión - Crypto Market";
     }
 }
 </script>

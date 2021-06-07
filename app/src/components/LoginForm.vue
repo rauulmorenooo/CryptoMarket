@@ -99,7 +99,9 @@ export default {
               this.$http({
                   url: 'http://api.rmoreno.me/user/login',
                   method: 'post',
-                  headers: {'Content-type': 'application/json'},
+                  headers: {'Content-type':'application/json',
+                              'Access-Control-Allow-Origin': '*'
+                              },
                   data: {
                       email: this.form.email,
                       pwd: this.form.password

@@ -230,7 +230,9 @@ export default {
                 this.$http({
                     url: 'http://api.rmoreno.me/user/' + this.id,
                     method: 'put',
-                    headers: {'Content-type': 'application/json'},
+                    headers: {'Content-type':'application/json',
+                              'Access-Control-Allow-Origin': '*'
+                              },
                     data: {
                         fname: this.form.firstname,
                         lname: this.form.lastname,
@@ -252,7 +254,9 @@ export default {
                 this.$http({
                 url: 'http://api.rmoreno.me/user/' + this.id,
                 method: 'delete',
-                headers: {'Content-type': 'application/json'},
+                headers: {'Content-type':'application/json',
+                              'Access-Control-Allow-Origin': '*'
+                              },
                 }).then((res) => {
                     if(res.data.code === 0) {
                         this.logged = false;

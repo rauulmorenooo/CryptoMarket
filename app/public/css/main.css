@@ -1,6 +1,6 @@
-.content-cryptomarket {
+/* .content-cryptomarket {
     height: 85vh;
-}
+} */
 
 .table-father {
     width: 100vw;
@@ -25,8 +25,9 @@
 }
 
 .selector {
-    max-width: 12rem;
+    /* max-width: 20rem; */
     /* margin: 0 1rem 0 0; */
+    text-align-last: center;
 }
 
 strong {
@@ -74,7 +75,7 @@ strong {
 
 .options {
     height: auto;
-    margin-left: 0.5rem;
+    /* margin-left: 0.5rem; */
     display: flex;
     flex-direction: column;
 }
@@ -92,7 +93,7 @@ strong {
 }
 
 .chart {
-    width: 100%;
+    margin-left: 1rem;
 }
 
 .type {
@@ -102,4 +103,58 @@ strong {
 .type > button {
     max-width: 6rem;
     margin: 0 0.5rem;
+}
+
+.dates {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-end;
+}
+
+.dates > span {
+    display: flex;
+    margin-bottom: 0.5rem;
+}
+
+.dates > span > div {
+    width: 12rem;
+    margin-left: 0.5rem;
+}
+
+.i-data {
+    display: flex;
+    flex-direction: column;
+}
+
+#creditos {
+    display: flex;
+    flex-direction: row;
+}
+
+#creditos-input {
+    max-width: 8rem;
+}
+
+.content-investment {
+    height: auto;
+    display: grid;
+    grid-template-columns: auto auto auto auto;
+    grid-gap: 1rem;
+    margin-left: 1rem;
+}
+
+.investment-top {
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.investment-top > h6 {
+    margin: 1rem;
+}
+
+.investment-top > button {
+    margin: 1rem;
 }

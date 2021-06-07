@@ -17,6 +17,9 @@ export default {
         'NavBar': NavBar,
         'PricesComponent': PricesComponent,
         'Footer': Footer
+    },
+    mounted: function() {
+        document.title = "Precios - Crypto Market";
     }
 }
 </script>
