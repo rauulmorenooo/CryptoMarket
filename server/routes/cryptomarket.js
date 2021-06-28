@@ -2856,7 +2856,7 @@ router.post('/user/:id/investmultiple', async (req, res) => {
         credits: 0
     }
     
-    if (req.body.inversiones != null) {
+    if (req.body.inversiones != null && req.body.total != null) {
         req.body.inversiones.forEach(i => {
             investments.push({
                 user: id,
@@ -2895,13 +2895,14 @@ router.post('/user/:id/investmultiple', async (req, res) => {
                             msg: 'An error has ocurred ' + err
                         });  
                     }
-                })
-
-                return res.status(200).json({
-                    status: 'OK',
-                    code: 0,
-                    msg: 'Inversiones realizadas correctamente'
+                    console.log(r);
+                    return res.status(200).json({
+                        status: 'OK',
+                        code: 0,
+                        msg: 'Inversiones realizadas correctamente'
+                    });
                 });
+
             } else {
                 return res.status(500).json({
                     status: 'ERROR',

@@ -1,12 +1,16 @@
 <template>
-    <div class="d-flex flex-column align-items-center" style="height: 85vh">
+    <div class="login" style="height: 85vh">
+        <h2 style="margin: 3vh 0 3vh 0"> Registrarme </h2>
+        <b-modal id="register" :title="modal_title" ok-only @ok="reload">
+            <p>{{modal_text}}</p>
+        </b-modal>
         <div v-if="error" class="text-danger">
             <li v-for="error in errors" :key="error.msg">
                 {{error.msg}}
             </li>
         </div>
         <br v-if="error">
-        <b-form @submit="onSubmit" @reset="onReset" v-if="show">
+        <b-form class="form-login" @submit="onSubmit" @reset="onReset" v-if="show">
             <b-form-group
                 id="input-group-firstname"
                 label-for="input-first-name"
@@ -15,7 +19,7 @@
                 <template #label>
                     Nombre<span class="text-danger">*</span>
                 </template>
-                <b-form-input :class="firstname"
+                <b-form-input style="min-width: 16rem;" :class="firstname"
                     id="input-first-name"
                     v-model="form.firstname"
                     type="text"
@@ -32,7 +36,7 @@
                 <template #label>
                     Apellidos<span class="text-danger">*</span>
                 </template>
-                <b-form-input :class="lastname"
+                <b-form-input style="min-width: 16rem;" :class="lastname"
                     id="input-last-name"
                     v-model="form.lastname"
                     type="text"
@@ -49,7 +53,7 @@
                 <template #label>
                     Nombre de usuario<span class="text-danger">*</span>
                 </template>
-                <b-form-input :class="username"
+                <b-form-input style="min-width: 16rem;" :class="username"
                     id="input-username"
                     v-model="form.username"
                     type="text"
@@ -66,7 +70,7 @@
                 <template #label>
                     Correo Electrónico<span class="text-danger">*</span>
                 </template>
-                <b-form-input :class="email"
+                <b-form-input style="min-width: 16rem;" :class="email"
                     id="input-email"
                     v-model="form.email"
                     type="email"
@@ -83,7 +87,7 @@
                 <template #label>
                     Contraseña<span class="text-danger">*</span>
                 </template>
-                <b-form-input :class="password"
+                <b-form-input style="min-width: 16rem;" :class="password"
                     id="input-password"
                     v-model="form.password"
                     type="password"
@@ -100,7 +104,7 @@
                 <template #label>
                     Repite la contraseña<span class="text-danger">*</span>
                 </template>
-                <b-form-input :class="rpassword"
+                <b-form-input style="min-width: 16rem;" :class="rpassword"
                     id="input-rpassword"
                     v-model="form.rpassword"
                     type="password"
@@ -108,8 +112,10 @@
                     required
                 />
             </b-form-group>
-            <b-button type="reset" variant="warning">Limpiar</b-button>
-            <b-button type="submit" variant="primary">Registrame</b-button>
+            <div class="login-form-buttons">
+                <b-button type="reset" variant="warning">Limpiar</b-button>
+                <b-button type="submit" variant="primary">Registrame</b-button>
+            </div>
         </b-form>
     </div>
 </template>
@@ -141,7 +147,10 @@ export default {
             passwordFeedback: '',
             rpasswordFeedback: '',
             error: false,
-            errors: []
+            errors: [],
+            modal_title: '',
+            modal_text: '',
+            ok: false
         }
     },
     computed: {
@@ -249,8 +258,10 @@ export default {
                 }).then((res) => {
                     console.log(res);
                     if (res.data.code === 0) {
-                        // TODO: Avisar al user que sa registrao correctamente
-                        this.$router.push('/');
+                        this.modal_title = "¡Cuenta registrada!";
+                        this.modal_text = "Has registrado una cuenta en Crypto Market";
+                        this.ok = true;
+                        this.$bvModal.show("register");
                     } else {
                         this.error = true;
                         if (res.data.code.length == undefined) {
@@ -292,10 +303,16 @@ export default {
                                     //alert('Ha ocurrido un problema con el servidor');
                             }
                         });
-                        }       
+                        }
+                        this.modal_title = "¡Ha ocurrido un problema!";
+                        this.modal_text = "Ha ocurrido un problema al iniciar sesión";
+                        this.$bvModal.show("register")
+
                     }
                 }, (err) => {
-                    console.log(err);
+                    this.modal_title = "¡Ha ocurrido un problema!";
+                    this.modal_text = "Ha ocurrido un problema al iniciar sesión";
+                    this.$bvModal.show("register")
                 });
             }
         }, 
@@ -311,6 +328,12 @@ export default {
             this.$nextTick(() => {
                 this.show = true;
             });
+        },
+        reload: function() {
+            if (this.ok) {
+                this.$router.push('/');
+            }
+            this.ok = false;
         }
     }
 }

@@ -6,15 +6,8 @@
             <b-button variant="info" @click="showExportar">Exportar Inversiones</b-button>
             <b-button variant="info" @click="showImportar">Importar Inversiones</b-button>
         </div>
-        <div v-if="investments.length <= 0">
-            <h3>¡Aún no has realizado ninguna inversión!</h3>
-        </div>
-        <div class="content-investment" v-if="investments.length > 0" style="
-        display: grid;
-        grid-template-columns: auto auto auto auto;
-        grid-gap: 1rem;
-        margin-left: 1rem;">
-            <b-modal id="close" title="¿Cerrar Inversión?" @ok="close">
+
+        <b-modal id="close" title="¿Cerrar Inversión?" @ok="close">
                 <p>¿Estas seguro de cerrar la inversión?</p>
             </b-modal>
             <b-modal id="credito" :title="modal_title" ok-only @ok="reload">
@@ -39,6 +32,15 @@
             <b-modal id="importOk" title="Importadas correctamente" ok-only @ok="reload">
                 <p>¡Inversiones realizadas correctamente!</p>
             </b-modal>
+
+        <div v-if="investments.length <= 0">
+            <h3>¡Aún no has realizado ninguna inversión!</h3>
+        </div>
+        <div class="content-investment" v-if="investments.length > 0" style="
+        display: grid;
+        grid-template-columns: auto auto auto auto;
+        grid-gap: 1rem;
+        margin-left: 1rem;">
             <b-card v-for="i in this.investments" 
                 :key="i._id"
                 :title="i.symbol"
@@ -154,7 +156,6 @@
                         method: 'get',
                         headers: {'Content-type':'application/json'}
                     }).then((res) => {
-                        console.log(res);
                         if (res.data.code == 0) {
                             this.modal_title = 'Crédito añadido correctamente';
                             this.modal_text = 'Se ha añadido correctamente crédito a tu cuenta';
@@ -224,9 +225,11 @@
                                 method: 'post',
                                 headers: {'Content-type':'application/json'},
                                 data: {
+                                    total: result.total,
                                     inversiones: result.inversiones
                                 }
                             }).then((res) => {
+                                console.log(res);
                                 this.file1 = null;
                                 this.$bvModal.show("importOk");
                             });

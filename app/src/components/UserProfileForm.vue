@@ -1,5 +1,9 @@
 <template>
-    <div class="d-flex flex-column align-items-center content-cryptomarket" style="height: 85vh">
+    <div class="login" style="height: 85vh">
+        <b-modal id="perfil" :title="modal_title" ok-only @ok="reload">
+            <p>{{modal_text}}</p>
+        </b-modal>
+        <h2 style="margin: 6vh 0 3vh 0">Modificar Perfil</h2>
         <div v-if="error" class="text-danger">
             <li v-for="error in errors" :key="error.msg">
                 {{error.msg}}
@@ -12,7 +16,7 @@
                 label-for="input-first-name"
                 :invalid-feedback="firstNameFeedback"
             >
-                <b-form-input :class="firstname"
+                <b-form-input style="min-width: 16rem;" :class="firstname"
                     id="input-first-name"
                     v-model="form.firstname"
                     type="text"
@@ -26,7 +30,7 @@
                 label-for="input-last-name"
                 :invalid-feedback="lastNameFeedback"
             >
-                <b-form-input :class="lastname"
+                <b-form-input style="min-width: 16rem;" :class="lastname"
                     id="input-last-name"
                     v-model="form.lastname"
                     type="text"
@@ -40,7 +44,7 @@
                 label-for="input-email"
                 :invalid-feedback="emailFeedback"
             >
-                <b-form-input :class="email"
+                <b-form-input style="min-width: 16rem;" :class="email"
                     id="input-email"
                     v-model="form.email"
                     type="email"
@@ -56,7 +60,7 @@
                 <template #label>
                     Contraseña actual<span class="text-danger">*</span>
                 </template>
-                <b-form-input :class="opassword"
+                <b-form-input style="min-width: 16rem;" :class="opassword"
                     id="input-opassword"
                     v-model="form.opassword"
                     type="password"
@@ -72,7 +76,7 @@
                 <template #label>
                     Nueva contraseña<span class="text-danger">*</span>
                 </template>
-                <b-form-input :class="password"
+                <b-form-input style="min-width: 16rem;" :class="password"
                     id="input-password"
                     v-model="form.password"
                     type="password"
@@ -88,15 +92,17 @@
                 <template #label>
                     Repite nueva contraseña<span class="text-danger">*</span>
                 </template>
-                <b-form-input :class="rpassword"
+                <b-form-input style="min-width: 16rem;" :class="rpassword"
                     id="input-rpassword"
                     v-model="form.rpassword"
                     type="password"
                     placeholder="Repite nueva contraseña"
                 />
             </b-form-group>
-            <b-button type="button" @click="deleteAccount" variant="danger">Eliminar Cuenta</b-button>
-            <b-button type="submit" variant="primary">Guardar</b-button>
+            <div class="login-form-buttons">
+                <b-button type="button" @click="deleteAccount" variant="danger">Eliminar Cuenta</b-button>
+                <b-button type="submit" variant="primary">Guardar</b-button>
+            </div>
         </b-form>
     </div>
 </template>
@@ -128,7 +134,10 @@ export default {
             passwordFeedback: '',
             rpasswordFeedback: '',
             error: false,
-            errors: []
+            errors: [],
+            modal_title: '',
+            modal_text: '',
+            ok: false
         }
     },
     mounted() {
@@ -242,9 +251,16 @@ export default {
                         rpwd: this.form.rpassword
                     }
                 }).then((res) => {
-                    console.log(res);
+                    if (res.data.code == 0) {
+                        this.ok = true;
+                        this.modal_title = "¡Información modificada!";
+                        this.modal_text = "Se ha modificado la información de tu perfil";
+                        this.$bvModal.show("perfil");
+                    }
                 }, (err) => {
-                    console.log(err);
+                    this.modal_title = "¡Error!";
+                    this.modal_text = "Ha ocurrido un error al modificar la información de tu perfil";
+                    this.$bvModal.show("perfil");
                 });
             }
         },
@@ -279,13 +295,19 @@ export default {
                             if (this.$session.exists() && this.$session.has('username'))
                             this.$session.remove('username');
                         }
-
-                        this.$router.push('/');
+                        this.ok = true;
+                        this.modal_title = "¡Cuenta Eliminada!";
+                        this.modal_text = "Cuenta eliminada correctamente";
+                        this.$bvModal.show("perfil");
                     }
                 }, (err) => {
                     console.log(err);
                 });
             }
+        },
+        reload: function() {
+        if (this.ok) this.$router.push('/');
+        this.ok = false;
         }
       }
 }

@@ -1,6 +1,6 @@
 <template>
-    <div>
-        <b-table striped bordered small hover no-border-collapse :items="items"></b-table>
+    <div style="width: 50%">
+        <b-table class="text-center" striped bordered small hover no-border-collapse :items="items"></b-table>
     </div>
 </template>
 

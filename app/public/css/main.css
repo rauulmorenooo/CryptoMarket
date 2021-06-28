@@ -1,9 +1,5 @@
-/* .content-cryptomarket {
-    height: 85vh;
-} */
-
 .table-father {
-    width: 100vw;
+    width: auto;
 
     display: flex;
     flex-direction: row;
@@ -25,7 +21,8 @@
 }
 
 .selector {
-    /* max-width: 20rem; */
+    max-width: 30rem;
+    min-height: 3rem;
     /* margin: 0 1rem 0 0; */
     text-align-last: center;
 }
@@ -65,7 +62,7 @@ strong {
 .main {
     display: flex;
     flex-direction: row;
-    
+
     height: 100%;
 }
 
@@ -157,4 +154,51 @@ strong {
 
 .investment-top > button {
     margin: 1rem;
+}
+
+.table-content {
+    display:flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 1rem;
+    width: 75%;
+}
+
+.historic {
+    /* width: 75%; */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.date-picker {
+    display: block;
+    max-height: 3rem;
+    min-width: 12rem;
+    justify-content: center;
+}
+
+.historical-table {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.login {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.form-login {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.login-form-buttons > button {
+    margin: 0 1rem;
 }

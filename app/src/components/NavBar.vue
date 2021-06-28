@@ -34,8 +34,8 @@
                 </b-navbar-nav>
                 
                 <b-navbar-nav class="ml-auto" v-else>
-                    <b-nav-item href="/login">Login</b-nav-item>
-                    <b-nav-item href="/register">Registrarse</b-nav-item>
+                    <b-nav-item href="/login">Iniciar Sesión</b-nav-item>
+                    <b-nav-item href="/register">Registrarme</b-nav-item>
                 </b-navbar-nav>
             </b-collapse>
         </b-navbar>
